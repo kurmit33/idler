@@ -1,11 +1,16 @@
 let money=5;
 
 function update(name, obj, m){
-    $(name).find('.buildings').html(obj.buildings);
-    $(name).find('.level').html(obj.level+1);
-    $(name).find('.production').html(obj.production());
-    $(name).find('.buildPrice').html(obj.buildPrice());
-    $(name).find('.upgradePrice').html(obj.upgradePrice());
+    document.querySelector(name).querySelector('.buildings').innerHTML=obj.buildings;
+    document.querySelector(name).querySelector('.level').innerHTML=obj.level+1;
+    document.querySelector(name).querySelector('.production').innerHTML=obj.production();
+    document.querySelector(name).querySelector('.buildPrice').innerHTML=obj.buildPrice();
+    document.querySelector(name).querySelector('.upgradePrice').innerHTML=obj.upgradePrice();
+    //$(name).find('.buildings').html(obj.buildings);
+    //$(name).find('.level').html(obj.level+1);
+    //$(name).find('.production').html(obj.production());
+    //$(name).find('.buildPrice').html(obj.buildPrice());
+    //$(name).find('.upgradePrice').html(obj.upgradePrice());
     if(m==true) document.getElementById("money").innerHTML='Money '+money;
 } 
 
