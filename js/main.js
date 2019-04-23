@@ -1,23 +1,17 @@
 let money=5;
 
-function update(name, obj, updateMoney){
-    document.querySelector(`${name} .buildings`).innerHTML=obj.buildings;
-    document.querySelector(`${name} .level`).innerHTML=obj.level+1;
-    document.querySelector(`${name} .production`).innerHTML=obj.production();
-    document.querySelector(`${name} .buildPrice`).innerHTML=obj.buildPrice();
-    document.querySelector(`${name} .upgradePrice`).innerHTML=obj.upgradePrice();
-    if(updateMoney) document.getElementById("money").innerHTML='Money '+money;
-} 
-
-function updateStorage(name, obj){
-    localStorage.setItem(name+'level', obj.level);
-    localStorage.setItem(name+'buildings', obj.buildings);
+function updateResources(){
+    document.getElementById("money").innerHTML='Money '+money;
 }
 
-function getStorage(name, obj){
-    obj.level = Number(localStorage.getItem(name+'level'));
-    obj.buildings = Number(localStorage.getItem(name+'buildings'));
+function setResources(){
+    localStorage.setItem('money', money);
 }
+
+function getResources(){
+    money = Number(localStorage.getItem('money'));
+}
+
 class PowerPlant{
     constructor(name, multiplier){
         this.buildings = 0;
@@ -26,6 +20,15 @@ class PowerPlant{
         this.name = name;
         this.price = 5;
     }
+
+    update = function () {
+        document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
+        document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
+        document.querySelector(`${this.name} .production`).innerHTML=this.production();
+        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice();
+        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
+    }
+
     production = function () {
         if (this.buildings==0) return 0;
         else return (this.buildings*(this.level+1)*this.multiplier)/100;
@@ -40,7 +43,7 @@ class PowerPlant{
         if(m>=this.buildPrice()){
             money = Number((money - this.buildPrice()).toFixed(3));
             this.buildings++;
-            update(this.name, this, true);
+            this.update();
         }
         else ;//alert("You need more money!");
     }
@@ -53,46 +56,47 @@ class PowerPlant{
         if(m>=this.upgradePrice()){
             money = Number((money - this.upgradePrice()).toFixed(3));
             this.level++;
-            update(this.name, this, true);
+            this.update();
         }
         else ;//alert("You need more money!");
+    }
+
+    getStorage = function(){
+        this.level = Number(localStorage.getItem(this.name+'Level'));
+        this.buildings = Number(localStorage.getItem(this.name+'Buildings'));
+    }
+
+    updateStorage = function(){
+        localStorage.setItem(this.name+'Level', this.level);
+        localStorage.setItem(this.name+'Buildings', this.buildings);
     }
 }
 
 let wt = new PowerPlant('#wind', 1);
 let sp = new PowerPlant('#solar', 10);
-
-if(localStorage.length !=0){
-    getStorage('wt', wt);
-    getStorage('sp', sp);
-    money = Number(localStorage.getItem('money'));
-}
 window.onload = function(){
-    update('#wind', wt, true);
-    update('#solar', sp, false);
+    if(localStorage.length >0){
+        wt.getStorage();
+        sp.getStorage();
+    }
+    wt.update();
+    sp.update();
+    updateResources();
 }
 
-$('#wind').find('.build').click(function(){
-    wt.build(money);
-});
-$('#wind').find('.upgrade').click(function(){
-    wt.upgrade(money);
-});
-
-$('#solar').find('.build').click(function(){
-    sp.build(money);
-});
-$('#solar').find('.upgrade').click(function(){
-    sp.upgrade(money);
-});
+document.querySelector(`${wt.name} .build`).addEventListener('click', function(){ wt.build(money) });
+document.querySelector(`${wt.name} .upgrade`).addEventListener('click', function(){ wt.upgrade(money) });
+document.querySelector(`${sp.name} .build`).addEventListener('click', function(){ sp.build(money) });
+document.querySelector(`${sp.name} .upgrade`).addEventListener('click', function(){ sp.upgrade(money) });
 
 setInterval(function(){
     money = Number((money + Number(wt.production()+sp.production())).toFixed(2));
-    document.getElementById("money").innerHTML='Money '+money;
+    updateResources();
 }, 100);
+
 setInterval(function(){
     localStorage.clear();
-    updateStorage('wt', wt);
-    updateStorage('sp', sp);
-    localStorage.setItem('money', money);
+    wt.updateStorage();
+    sp.updateStorage();
+    setResources();
 }, 1000);
