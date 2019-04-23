@@ -6,10 +6,8 @@ function update(name, obj, m){
     $(name).find('.production').html(obj.production());
     $(name).find('.buildPrice').html(obj.buildPrice());
     $(name).find('.upgradePrice').html(obj.upgradePrice());
-    let n = document.getElementById("money");
-    console.log(n);
-    if(m==true) n.innerHTML='Money '+money;//$("#money").html = "Money "+money;
-}
+    if(m==true) document.getElementById("money").innerHTML='Money '+money;
+} 
 
 function updateStorage(name, obj){
     localStorage.setItem(name+'level', obj.level);
@@ -132,7 +130,7 @@ $('#solar').find('.upgrade').click(function(){
 
 setInterval(function(){
     money = Number((money + Number(wt.production()+sp.production())).toFixed(2));
-    $('#money').html("Money "+money);
+    document.getElementById("money").innerHTML='Money '+money;
 }, 100);
 setInterval(function(){
     localStorage.clear();
