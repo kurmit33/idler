@@ -1,17 +1,12 @@
 let money=5;
 
-function update(name, obj, m){
-    document.querySelector(name).querySelector('.buildings').innerHTML=obj.buildings;
-    document.querySelector(name).querySelector('.level').innerHTML=obj.level+1;
-    document.querySelector(name).querySelector('.production').innerHTML=obj.production();
-    document.querySelector(name).querySelector('.buildPrice').innerHTML=obj.buildPrice();
-    document.querySelector(name).querySelector('.upgradePrice').innerHTML=obj.upgradePrice();
-    //$(name).find('.buildings').html(obj.buildings);
-    //$(name).find('.level').html(obj.level+1);
-    //$(name).find('.production').html(obj.production());
-    //$(name).find('.buildPrice').html(obj.buildPrice());
-    //$(name).find('.upgradePrice').html(obj.upgradePrice());
-    if(m==true) document.getElementById("money").innerHTML='Money '+money;
+function update(name, obj, updateMoney){
+    document.querySelector(`${name} .buildings`).innerHTML=obj.buildings;
+    document.querySelector(`${name} .level`).innerHTML=obj.level+1;
+    document.querySelector(`${name} .production`).innerHTML=obj.production();
+    document.querySelector(`${name} .buildPrice`).innerHTML=obj.buildPrice();
+    document.querySelector(`${name} .upgradePrice`).innerHTML=obj.buildPrice();
+    if(updateMoney) document.getElementById("money").innerHTML='Money '+money;
 } 
 
 function updateStorage(name, obj){
