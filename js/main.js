@@ -5,7 +5,7 @@ function update(name, obj, updateMoney){
     document.querySelector(`${name} .level`).innerHTML=obj.level+1;
     document.querySelector(`${name} .production`).innerHTML=obj.production();
     document.querySelector(`${name} .buildPrice`).innerHTML=obj.buildPrice();
-    document.querySelector(`${name} .upgradePrice`).innerHTML=obj.buildPrice();
+    document.querySelector(`${name} .upgradePrice`).innerHTML=obj.upgradePrice();
     if(updateMoney) document.getElementById("money").innerHTML='Money '+money;
 } 
 
@@ -18,91 +18,49 @@ function getStorage(name, obj){
     obj.level = Number(localStorage.getItem(name+'level'));
     obj.buildings = Number(localStorage.getItem(name+'buildings'));
 }
-
-class WindTurbine {
-    constructor(){
+class PowerPlant{
+    constructor(name, multiplier){
         this.buildings = 0;
         this.level = 0;
-        this.priceNewBuilding = 5;
-        this.priceNextLevel = 50;
+        this.multiplier = multiplier;
+        this.name = name;
+        this.price = 5;
     }
-
     production = function () {
         if (this.buildings==0) return 0;
-        else return (this.buildings*(this.level+1))/100;
-    }    
+        else return (this.buildings*(this.level+1)*this.multiplier)/100;
+    }
 
     buildPrice = function(){
-        if(this.buildings == 0) return this.priceNewBuilding;
-        else return  this.priceNewBuilding+this.buildings*3;
+        if(this.buildings == 0) return this.price*this.multiplier;
+        else return  (this.price+this.buildings*3)*this.multiplier;
     }
 
     build = function(m){
         if(m>=this.buildPrice()){
             money = Number((money - this.buildPrice()).toFixed(3));
             this.buildings++;
-            update('#wind', this, true);
+            update(this.name, this, true);
         }
         else ;//alert("You need more money!");
     }
     upgradePrice = function(){
-        if(this.level==0)   return this.priceNextLevel;
-        else                return this.level*5*this.priceNextLevel;
+        if(this.level==0)   return this.price*10*this.multiplier;
+        else                return this.level*50*this.price*this.multiplier;
     }
 
     upgrade = function(m){
         if(m>=this.upgradePrice()){
             money = Number((money - this.upgradePrice()).toFixed(3));
             this.level++;
-            update('#wind', this, true);
+            update(this.name, this, true);
         }
         else ;//alert("You need more money!");
     }
 }
 
-class SolarPanel {
-    constructor(){
-        this.buildings = 0;
-        this.level = 0;
-        this.priceNewBuilding = 50;
-        this.priceNextLevel = 500;
-    }
-
-    production = function () {
-        if (this.buildings==0) return 0;
-        else return (this.buildings*(this.level+1))/10;
-    }    
-
-    buildPrice = function(){
-        if(this.buildings == 0) return this.priceNewBuilding;
-        else return  this.priceNewBuilding+this.buildings*25;
-    }
-
-    build = function(m){
-        if(m>=this.buildPrice()){
-            money = Number((money - this.buildPrice()).toFixed(2));
-            this.buildings++;
-            update('#solar', this, true);
-        }
-        else ;//alert("You need more money!");
-    }
-    upgradePrice = function(){
-        if(this.level==0)   return this.priceNextLevel;
-        else                return this.level*5*this.priceNextLevel;
-    }
-
-    upgrade = function(m){
-        if(m>=this.upgradePrice()){
-            money = Number((money - this.upgradePrice()).toFixed(2));
-            this.level++;
-            update('#solar', this, true);
-        }
-        else ;//alert("You need more money!");
-    }
-}
-
-let wt = new WindTurbine();
-let sp = new SolarPanel();
+let wt = new PowerPlant('#wind', 1);
+let sp = new PowerPlant('#solar', 10);
 
 if(localStorage.length !=0){
     getStorage('wt', wt);
