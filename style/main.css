@@ -89,17 +89,17 @@ body{
     border: 1px solid red;
     color: red;
     border-radius: 10px;
-    width: 100px;
+    width: auto;
     height: 1.5em;
     justify-content: center;
     font-family: sans-serif;
     align-items: center;
 }
 
-.close{
-    top: -2em;
-}
-
 .open{
     top: 0;
+}
+
+.close{
+    top: -2em;
 }
