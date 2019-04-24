@@ -5,13 +5,14 @@ let electrictyPrice = 0;
 let greenPrice = 0;
 
 function alert(text){
-    document.querySelector("#alert").innerHTML = text;
-    document.querySelector("#alert").classList.remove('close');
-    document.querySelector("#alert").classList.add('open');
+    let alert = document.querySelector("#alert");
+    alert.innerHTML = text;
+    alert.classList.remove('close');
+    alert.classList.add('open');
     setTimeout(()=>{
-        document.querySelector("#alert").classList.remove('open');
-        document.querySelector("#alert").classList.add('close');
-        document.querySelector("#alert").innerHTML = "";
+        alert.classList.remove('open');
+        alert.classList.add('close');
+        alert.innerHTML = "";
     }, 2000);
 }
 
