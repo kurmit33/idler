@@ -13,7 +13,7 @@ body{
 }
 
 .money, .electricty, .greenCer{
-    margin: 10px 5px;
+
 }
 
 .rows{
@@ -29,7 +29,7 @@ body{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     width: 150px;
     margin: 0px 10px;
 }

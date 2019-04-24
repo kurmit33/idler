@@ -1,12 +1,13 @@
-let money=5;
-let electricty=0;
+let money = 5;
+let electricty = 0;
 let greenCertification = 0;
 let electrictyPrice = 0;
+let greenPrice = 0;
 
 function updateResources(){
-    document.querySelector(".money").innerHTML='Money '+money;
-    document.querySelector(".electricty").innerHTML='Electricty '+electricty;
-    document.querySelector(".greenCer").innerHTML='Green certification '+greenCertification;
+    document.querySelector(".money").innerHTML='Money: '+money;
+    document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
+    document.querySelector(".greenCer").innerHTML='Green certification: '+greenCertification;
 }
 
 function setResources(){
@@ -21,8 +22,26 @@ function getResources(){
     greenCertification = Number(localStorage.getItem('greenCertification'));
 }
 
-function getElectrictyPrice() {
-    return ((Math.floor(Math.random() * (35 - 1)) + 1)/100).toFixed(2);
+function getPrice(){
+    electrictyPrice = Number((Math.floor(Math.random() * (35 - 1)) + 1)/100).toFixed(2);
+    greenPrice = Number((Math.floor(Math.random() * (150 - 10)) + 10)).toFixed(2);
+    document.querySelector('.priceElectricty').innerHTML = "Electricty price: "+ electrictyPrice;
+    document.querySelector('.priceGreenCer').innerHTML = "Green price: "+ greenPrice;
+}
+
+function sell(name){
+    switch(name){
+        case 'electricty':
+            money = Number(money)+Number(electricty)*Number(electrictyPrice);
+            money = money.toFixed(5);
+            electricty = 0;
+        break;
+        case 'green':
+            money = Number(money)+Number(greenCertification)*Number(greenPrice);
+            money = money.toFixed(5);
+            greenCertification = 0;
+        break;
+    }
 }
 
 class PowerPlant{
@@ -34,7 +53,7 @@ class PowerPlant{
         this.price = 5;
     }
 
-    update = function () {
+    update = ()=> {
         document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
         document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
@@ -54,7 +73,7 @@ class PowerPlant{
 
     build = (m)=>{
         if(m>=this.buildPrice()){
-            money = Number((money - this.buildPrice()).toFixed(3));
+            money = Number((money - this.buildPrice()).toFixed(5));
             this.buildings++;
             this.update();
         }
@@ -68,7 +87,7 @@ class PowerPlant{
 
     upgrade = (m)=>{
         if(m>=this.upgradePrice()){
-            money = Number((money - this.upgradePrice()).toFixed(3));
+            money = Number((money - this.upgradePrice()).toFixed(5));
             this.level++;
             this.update();
         }
@@ -93,21 +112,23 @@ window.onload = ()=>{
     if(localStorage.length >0){
         wt.getStorage();
         sp.getStorage();
+        getResources();
     }
     wt.update();
     sp.update();
-    getResources();
-    electrictyPrice = getElectrictyPrice();
-    document.querySelector('.sellPrice').innerHTML = electrictyPrice;
+    updateResources();
+    getPrice();
 }
 
-document.querySelector(`${wt.name} .build`).addEventListener('click', function(){ wt.build(money) });
-document.querySelector(`${wt.name} .upgrade`).addEventListener('click', function(){ wt.upgrade(money) });
-document.querySelector(`${sp.name} .build`).addEventListener('click', function(){ sp.build(money) });
-document.querySelector(`${sp.name} .upgrade`).addEventListener('click', function(){ sp.upgrade(money) });
+document.querySelector(`${wt.name} .build`).addEventListener('click', ()=>{ wt.build(money) });
+document.querySelector(`${wt.name} .upgrade`).addEventListener('click', ()=>{ wt.upgrade(money) });
+document.querySelector(`${sp.name} .build`).addEventListener('click', ()=>{ sp.build(money) });
+document.querySelector(`${sp.name} .upgrade`).addEventListener('click', ()=>{ sp.upgrade(money) });
+document.querySelector('.sellElectricty').addEventListener('click', ()=>{sell('electricty')});
+document.querySelector('.sellgreenCer').addEventListener('click', ()=>{sell('green')});
 
 setInterval(()=>{
-    electricty = Number((electricty + Number(wt.production()+sp.production())).toFixed(2));
+    electricty = Number((electricty + Number(wt.production()+sp.production())).toFixed(3));
     updateResources();
 }, 100);
 
@@ -119,6 +140,5 @@ setInterval(()=>{
 }, 1000);
 
 setInterval(()=> {
-    electrictyPrice = getElectrictyPrice();
-    document.querySelector('.sellPrice').innerHTML = electrictyPrice;
+    getPrice();
 }, 60000)
