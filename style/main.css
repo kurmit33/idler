@@ -80,3 +80,26 @@ body{
 .sellElectricty, .sellgreenCer{
     width: 100px;
 }
+
+#alert{
+    display: flex;
+    position: absolute;
+    left: 40%;
+    background-color: black;
+    border: 1px solid red;
+    color: red;
+    border-radius: 10px;
+    width: 100px;
+    height: 1.5em;
+    justify-content: center;
+    font-family: sans-serif;
+    align-items: center;
+}
+
+.close{
+    top: -2em;
+}
+
+.open{
+    top: 0;
+}
