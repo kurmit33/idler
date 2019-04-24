@@ -39,12 +39,12 @@ body{
     margin: 0px 5px;
 }
 
-#wt{
+.wt{
     margin: 5px;
     background-image: url("img/wt.png");
 }
 
-#sl{
+.sl{
     margin: 5px;
     background-image: url("img/foto.png")
 }

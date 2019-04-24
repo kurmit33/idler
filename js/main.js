@@ -1,7 +1,9 @@
 let money=5;
 
 function updateResources(){
-    document.getElementById("money").innerHTML='Money '+money;
+    document.querySelector(".money").innerHTML='Money '+money;
+    document.querySelector(".money").innerHTML='Money '+money;
+    document.querySelector(".money").innerHTML='Money '+money;
 }
 
 function setResources(){
@@ -29,10 +31,10 @@ class PowerPlant{
         document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
     }
 
-    production = function () {
+    production = (()=>{ // tak metody wenętrzne
         if (this.buildings==0) return 0;
         else return (this.buildings*(this.level+1)*this.multiplier)/100;
-    }
+    });
 
     buildPrice = function(){
         if(this.buildings == 0) return this.price*this.multiplier;
@@ -47,6 +49,7 @@ class PowerPlant{
         }
         else ;//alert("You need more money!");
     }
+
     upgradePrice = function(){
         if(this.level==0)   return this.price*10*this.multiplier;
         else                return this.level*50*this.price*this.multiplier;
@@ -74,6 +77,7 @@ class PowerPlant{
 
 let wt = new PowerPlant('#wind', 1);
 let sp = new PowerPlant('#solar', 10);
+
 window.onload = function(){
     if(localStorage.length >0){
         wt.getStorage();
