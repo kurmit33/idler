@@ -9,6 +9,7 @@ body{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
 .money, .electricty, .greenCer{
@@ -50,17 +51,17 @@ body{
     margin: 0px 5px;
 }
 
-.wt{
+#wt{
     margin: 5px;
     background-image: url("img/wt.png");
 }
 
-.sl{
+#sl{
     margin: 5px;
     background-image: url("img/foto.png")
 }
 
-.build, .upgrade{
+.build, .upgrade, .sellElectricty, .sellgreenCer{
     width: auto;
     margin: 5px;
     text-align: center;
@@ -71,8 +72,11 @@ body{
     outline: none;
 }
 
-.build:hover, .upgrade:hover{
+.build:hover, .upgrade:hover, .sellElectricty:hover, .sellgreenCer:hover{
     border: 2px solid #131936;
     background-color: #209781;
     color: #131936;
+}
+.sellElectricty, .sellgreenCer{
+    width: 100px;
 }

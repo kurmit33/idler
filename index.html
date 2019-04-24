@@ -11,14 +11,20 @@
 <body>
     <div class="topStat">
             <div class="money"></div>
-            <div class="electricty"></div>
-            <div class="greenCer"></div>
+            <div class="columns">
+                <div class="electricty"></div>
+                <button class="sellElectricty">Sell</button>
+            </div>
+            <div class="columns">
+                <div class="greenCer"></div>
+                <button class="sellgreenCer">Sell</button>
+            </div>
     </div>
     <div class="cointeiner">
         <div class="rows">
             <div class="columns">
                 <div class="wind" class="columns">
-                    <div class="wt" class="building"></div>
+                    <div id="wt" class="building"></div>
                     <div class="stat"><span>Buildings: </span><span class="buildings"></span></div>
                     <div class="stat"><span>Level: </span><span class="level"></span></div>
                     <div class="stat"><span>Production: </span><span class="production"></span></div>
@@ -29,7 +35,7 @@
             </div>
             <div class="columns">
                 <div class="solar" class="columns">
-                    <div class="sl" class="building"></div>
+                    <div id="sl" class="building"></div>
                     <div class="stat"><span>Buildings: </span><span class="buildings"></span></div>
                     <div class="stat"><span>Level: </span><span class="level"></span></div>
                     <div class="stat"><span>Production: </span><span class="production"></span></div>
@@ -41,6 +47,7 @@
             <div class="columns"></div>
         </div>
     </div>
+    <div class="alert"></div>
     <script type="text/javascript" src='js/main.js'></script>
 </body>
 </html>
