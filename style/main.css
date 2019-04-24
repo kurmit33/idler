@@ -5,19 +5,31 @@ body{
     font-family: 'Lobster', sans-serif;
 }
 
+.topStat{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.money, .electricty, .greenCer{
+
+}
+
 .rows{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .columns{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     width: 150px;
     margin: 0px 10px;
 }
@@ -49,7 +61,7 @@ body{
     background-image: url("img/foto.png")
 }
 
-.build, .upgrade{
+.build, .upgrade, .sellElectricty, .sellgreenCer{
     width: auto;
     margin: 5px;
     text-align: center;
@@ -60,8 +72,11 @@ body{
     outline: none;
 }
 
-.build:hover, .upgrade:hover{
+.build:hover, .upgrade:hover, .sellElectricty:hover, .sellgreenCer:hover{
     border: 2px solid #131936;
     background-color: #209781;
     color: #131936;
+}
+.sellElectricty, .sellgreenCer{
+    width: 100px;
 }
