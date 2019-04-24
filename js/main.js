@@ -2,8 +2,8 @@ let money=5;
 
 function updateResources(){
     document.querySelector(".money").innerHTML='Money '+money;
-    document.querySelector(".money").innerHTML='Money '+money;
-    document.querySelector(".money").innerHTML='Money '+money;
+    document.querySelector(".electricty").innerHTML='Money '+money;
+    document.querySelector(".greenCer").innerHTML='Money '+money;
 }
 
 function setResources(){

@@ -5,12 +5,23 @@ body{
     font-family: 'Lobster', sans-serif;
 }
 
+.topStat{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.money, .electricty, .greenCer{
+    margin: 10px 5px;
+}
+
 .rows{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .columns{
