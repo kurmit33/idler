@@ -1,17 +1,28 @@
 let money=5;
+let electricty=0;
+let greenCertification = 0;
+let electrictyPrice = 0;
 
 function updateResources(){
     document.querySelector(".money").innerHTML='Money '+money;
-    document.querySelector(".electricty").innerHTML='Money '+money;
-    document.querySelector(".greenCer").innerHTML='Money '+money;
+    document.querySelector(".electricty").innerHTML='Electricty '+electricty;
+    document.querySelector(".greenCer").innerHTML='Green certification '+greenCertification;
 }
 
 function setResources(){
     localStorage.setItem('money', money);
+    localStorage.setItem('electricty', electricty);
+    localStorage.setItem('greenCertification', greenCertification);
 }
 
 function getResources(){
     money = Number(localStorage.getItem('money'));
+    electricty = Number(localStorage.getItem('electricty'));
+    greenCertification = Number(localStorage.getItem('greenCertification'));
+}
+
+function getElectrictyPrice() {
+    return ((Math.floor(Math.random() * (35 - 1)) + 1)/100).toFixed(2);
 }
 
 class PowerPlant{
@@ -31,17 +42,17 @@ class PowerPlant{
         document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
     }
 
-    production = (()=>{ // tak metody wenętrzne
+    production = ()=>{ // tak metody wenętrzne
         if (this.buildings==0) return 0;
         else return (this.buildings*(this.level+1)*this.multiplier)/100;
-    });
+    }
 
-    buildPrice = function(){
+    buildPrice = ()=>{
         if(this.buildings == 0) return this.price*this.multiplier;
         else return  (this.price+this.buildings*3)*this.multiplier;
     }
 
-    build = function(m){
+    build = (m)=>{
         if(m>=this.buildPrice()){
             money = Number((money - this.buildPrice()).toFixed(3));
             this.buildings++;
@@ -50,12 +61,12 @@ class PowerPlant{
         else ;//alert("You need more money!");
     }
 
-    upgradePrice = function(){
+    upgradePrice = ()=>{
         if(this.level==0)   return this.price*10*this.multiplier;
         else                return this.level*50*this.price*this.multiplier;
     }
 
-    upgrade = function(m){
+    upgrade = (m)=>{
         if(m>=this.upgradePrice()){
             money = Number((money - this.upgradePrice()).toFixed(3));
             this.level++;
@@ -64,28 +75,30 @@ class PowerPlant{
         else ;//alert("You need more money!");
     }
 
-    getStorage = function(){
+    getStorage = ()=>{
         this.level = Number(localStorage.getItem(this.name+'Level'));
         this.buildings = Number(localStorage.getItem(this.name+'Buildings'));
     }
 
-    updateStorage = function(){
+    updateStorage = ()=>{
         localStorage.setItem(this.name+'Level', this.level);
         localStorage.setItem(this.name+'Buildings', this.buildings);
     }
 }
 
-let wt = new PowerPlant('#wind', 1);
-let sp = new PowerPlant('#solar', 10);
+let wt = new PowerPlant('.wind', 1);
+let sp = new PowerPlant('.solar', 10);
 
-window.onload = function(){
+window.onload = ()=>{
     if(localStorage.length >0){
         wt.getStorage();
         sp.getStorage();
     }
     wt.update();
     sp.update();
-    updateResources();
+    getResources();
+    electrictyPrice = getElectrictyPrice();
+    document.querySelector('.sellPrice').innerHTML = electrictyPrice;
 }
 
 document.querySelector(`${wt.name} .build`).addEventListener('click', function(){ wt.build(money) });
@@ -93,14 +106,19 @@ document.querySelector(`${wt.name} .upgrade`).addEventListener('click', function
 document.querySelector(`${sp.name} .build`).addEventListener('click', function(){ sp.build(money) });
 document.querySelector(`${sp.name} .upgrade`).addEventListener('click', function(){ sp.upgrade(money) });
 
-setInterval(function(){
-    money = Number((money + Number(wt.production()+sp.production())).toFixed(2));
+setInterval(()=>{
+    electricty = Number((electricty + Number(wt.production()+sp.production())).toFixed(2));
     updateResources();
 }, 100);
 
-setInterval(function(){
+setInterval(()=>{
     localStorage.clear();
     wt.updateStorage();
     sp.updateStorage();
     setResources();
 }, 1000);
+
+setInterval(()=> {
+    electrictyPrice = getElectrictyPrice();
+    document.querySelector('.sellPrice').innerHTML = electrictyPrice;
+}, 60000)
