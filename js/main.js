@@ -4,6 +4,17 @@ let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
 
+function alert(text){
+    document.querySelector("#alert").innerHTML = text;
+    document.querySelector("#alert").classList.remove('close');
+    document.querySelector("#alert").classList.add('open');
+    setTimeout(()=>{
+        document.querySelector("#alert").classList.remove('open');
+        document.querySelector("#alert").classList.add('close');
+        document.querySelector("#alert").innerHTML = "";
+    }, 2000);
+}
+
 function updateResources(){
     document.querySelector(".money").innerHTML='Money: '+money;
     document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
@@ -61,7 +72,7 @@ class PowerPlant{
         document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
     }
 
-    production = ()=>{ // tak metody wenętrzne
+    production = ()=>{
         if (this.buildings==0) return 0;
         else return (this.buildings*(this.level+1)*this.multiplier)/100;
     }
@@ -77,7 +88,7 @@ class PowerPlant{
             this.buildings++;
             this.update();
         }
-        else ;//alert("You need more money!");
+        else alert("You need more money!");
     }
 
     upgradePrice = ()=>{
@@ -91,7 +102,7 @@ class PowerPlant{
             this.level++;
             this.update();
         }
-        else ;//alert("You need more money!");
+        else alert("You need more money!");
     }
 
     getStorage = ()=>{
