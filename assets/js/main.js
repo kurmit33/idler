@@ -167,6 +167,14 @@ document.querySelector('.sellgreenCer').addEventListener('click', function(){
     sell('green');
 });
 
+window.addEventListener('unload', function(){
+    localStorage.clear();
+    buildings.forEach((building)=>{
+        building.updateStorage();
+    });
+    setResources();
+});
+
 setInterval(function(){
     let newElectricty = 0;
     buildings.forEach((building)=>{
