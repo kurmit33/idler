@@ -36,7 +36,7 @@ function getResources(){
 }
 
 function getPrice(){
-    electrictyPrice = Number((Math.floor(Math.random() * (35 - 1)) + 1)/100).toFixed(2);
+    electrictyPrice = Number((Math.floor(Math.random() * (35 - 10)) + 10)/100).toFixed(2);
     greenPrice = Number((Math.floor(Math.random() * (150 - 10)) + 10)).toFixed(2);
     document.querySelector('.priceElectricty').innerHTML = "Electricty price: "+ electrictyPrice;
     document.querySelector('.priceGreenCer').innerHTML = "Green price: "+ greenPrice;
@@ -75,13 +75,11 @@ class PowerPlant{
     }
 
     production(){
-        if (this.buildings==0) return 0;
-        else return (this.buildings*(this.level+1)*this.multiplier)/10;
+        return (this.buildings*(this.level+1)*this.multiplier)/100;
     }
 
     buildPrice(){
-        if(this.buildings == 0) return this.price*this.multiplier;
-        else return  (this.price+this.buildings*3)*this.multiplier;
+        return Number((this.price+this.buildings*3)*this.multiplier);
     }
 
     build(m){
@@ -94,8 +92,7 @@ class PowerPlant{
     }
 
     upgradePrice(){
-        if(this.level==0)   return this.price*10*this.multiplier;
-        else                return this.level*50*this.price*this.multiplier;
+        return (1+this.level)*50*this.price*this.multiplier;
     }
 
     upgrade(m){
@@ -124,14 +121,48 @@ class GreenPowerPlant extends PowerPlant{
             money = Number((money - this.buildPrice()).toFixed(5));
             this.buildings++;
             if(this.buildings%25==0){
-                greenCertification += (1*this.multiplier);
+                greenCertification++;
             }
             this.update();
         }
         else fail("You need more money!");
     }
+
     production(){
-        return super.production()+Number(super.production()*greenCertification*0.01);
+        return (super.production()+Number(super.production()*greenCertification*0.001)).toFixed(3);
+    }
+}
+
+class ConvencionalPowerPlant extends PowerPlant{
+    constructor(name, multiplier){
+        super(name, multiplier);
+        this.buildPriceGreen = 0;
+        this.upgradePriceGreen = 0;
+        this.green = 10;
+    }
+    buildPrice(){
+        this.priceGreen = this.green * (this.buildings+1);
+        return super.buildPrice();
+    }
+    upgradePrice(){
+        this.upgradePriceGreen = this.green * (this.level+1);
+        return super.upgradePrice();
+    }
+    
+    build(m){
+        if(m>=this.buildPrice()){
+            money = Number((money - this.buildPrice()).toFixed(5));
+            this.buildings++;
+            if(this.buildings%25==0){
+                greenCertification++;
+            }
+            this.update();
+        }
+        else fail("You need more money!");
+    }
+
+    production(){
+        return (super.production()+Number(super.production()*greenCertification*0.002)).toFixed(3);
     }
 }
 
