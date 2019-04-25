@@ -4,7 +4,6 @@ let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
 
-
 function fail(text){
     let alert = document.querySelector("#alert");
     alert.innerHTML = text;
@@ -27,6 +26,7 @@ function setResources(){
     localStorage.setItem('money', money);
     localStorage.setItem('electricty', electricty);
     localStorage.setItem('greenCertification', greenCertification);
+    localStorage.setItem('lastTime', Date.now());
 }
 
 function getResources(){
@@ -137,12 +137,22 @@ const buildings = [
     new PowerPlant('.solar', 10),
 ];
 
+function offlineProduction(){
+    let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
+    let newElectricty = 0;
+    buildings.forEach(function(building){
+        newElectricty += Number(building.production()*timeDiff);
+    });
+    electricty += newElectricty;
+}
+
 window.onload = function(){
     if(localStorage.length != 0){
         buildings.forEach(function(building){
             building.getStorage();
         });
         getResources();
+        offlineProduction();
     }
     buildings.forEach(function(building){
         building.update();
@@ -167,22 +177,22 @@ document.querySelector('.sellgreenCer').addEventListener('click', function(){
     sell('green');
 });
 
+window.addEventListener('unload', function(){
+    localStorage.clear();
+    buildings.forEach((building)=>{
+        building.updateStorage();
+    });
+    setResources();
+});
+
 setInterval(function(){
     let newElectricty = 0;
-    buildings.forEach((building)=>{
+    buildings.forEach(function(building){
         newElectricty += Number(building.production());
     });
     electricty = Number((electricty + newElectricty).toFixed(3));
     updateResources();
 }, 100);
-
-setInterval(function(){
-    //localStorage.clear();
-    //buildings.forEach((building)=>{
-    //    building.updateStorage();
-    //});
-    //setResources();
-}, 1000);
 
 setInterval(function(){
     getPrice();
