@@ -76,7 +76,7 @@ class PowerPlant{
 
     production(){
         if (this.buildings==0) return 0;
-        else return (this.buildings*(this.level+1)*this.multiplier)/100;
+        else return (this.buildings*(this.level+1)*this.multiplier);
     }
 
     buildPrice(){
@@ -124,16 +124,19 @@ class GreenPowerPlant extends PowerPlant{
             money = Number((money - this.buildPrice()).toFixed(5));
             this.buildings++;
             if(this.buildings%25==0){
-                greenCertification++;
+                greenCertification += (1*this.multiplier);
             }
             this.update();
         }
         else fail("You need more money!");
     }
+    production(){
+        return super.production()+Number(super.production()*greenCertification*0.01);
+    }
 }
 
 const buildings = [
-    new PowerPlant('.wind', 1),
+    new GreenPowerPlant('.wind', 1),
     new PowerPlant('.solar', 10),
 ];
 
