@@ -4,6 +4,7 @@ let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
 
+
 function fail(text){
     let alert = document.querySelector("#alert");
     alert.innerHTML = text;
@@ -65,7 +66,7 @@ class PowerPlant{
         this.price = 5;
     }
 
-    update = ()=> {
+    update(){
         document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
         document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
@@ -73,17 +74,17 @@ class PowerPlant{
         document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
     }
 
-    production = ()=>{
+    production(){
         if (this.buildings==0) return 0;
         else return (this.buildings*(this.level+1)*this.multiplier)/100;
     }
 
-    buildPrice = ()=>{
+    buildPrice(){
         if(this.buildings == 0) return this.price*this.multiplier;
         else return  (this.price+this.buildings*3)*this.multiplier;
     }
 
-    build = (m)=>{
+    build(m){
         if(m>=this.buildPrice()){
             money = Number((money - this.buildPrice()).toFixed(5));
             this.buildings++;
@@ -92,12 +93,12 @@ class PowerPlant{
         else fail("You need more money!");
     }
 
-    upgradePrice = ()=>{
+    upgradePrice(){
         if(this.level==0)   return this.price*10*this.multiplier;
         else                return this.level*50*this.price*this.multiplier;
     }
 
-    upgrade = (m)=>{
+    upgrade(m){
         if(m>=this.upgradePrice()){
             money = Number((money - this.upgradePrice()).toFixed(5));
             this.level++;
@@ -106,19 +107,19 @@ class PowerPlant{
         else fail("You need more money!");
     }
 
-    getStorage = ()=>{
+    getStorage(){
         this.level = Number(localStorage.getItem(this.name+'Level'));
         this.buildings = Number(localStorage.getItem(this.name+'Buildings'));
     }
 
-    updateStorage = ()=>{
+    updateStorage(){
         localStorage.setItem(this.name+'Level', this.level);
         localStorage.setItem(this.name+'Buildings', this.buildings);
     }
 }
 
 class GreenPowerPlant extends PowerPlant{
-    build = (m)=>{
+    build(m){
         if(m>=this.buildPrice()){
             money = Number((money - this.buildPrice()).toFixed(5));
             this.buildings++;
@@ -136,21 +137,21 @@ const buildings = [
     new PowerPlant('.solar', 10),
 ];
 
-window.onload = ()=>{
-    if(localStorage.length >0){
-        buildings.forEach((building)=>{
+window.onload = function(){
+    if(localStorage.length != 0){
+        buildings.forEach(function(building){
             building.getStorage();
         });
         getResources();
     }
-    buildings.forEach((building)=>{
+    buildings.forEach(function(building){
         building.update();
     });
     updateResources();
     getPrice();
 }
 
-buildings.forEach((building)=>{
+buildings.forEach(function(building){
     document.querySelector(`${building.name} .build`).addEventListener('click', ()=>{ 
         building.build(money);
     });
@@ -159,14 +160,14 @@ buildings.forEach((building)=>{
     });    
 });
 
-document.querySelector('.sellElectricty').addEventListener('click', ()=>{
+document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
 });
-document.querySelector('.sellgreenCer').addEventListener('click', ()=>{
+document.querySelector('.sellgreenCer').addEventListener('click', function(){
     sell('green');
 });
 
-setInterval(()=>{
+setInterval(function(){
     let newElectricty = 0;
     buildings.forEach((building)=>{
         newElectricty += Number(building.production());
@@ -175,14 +176,14 @@ setInterval(()=>{
     updateResources();
 }, 100);
 
-setInterval(()=>{
-    localStorage.clear();
-    buildings.forEach((building)=>{
-        building.updateStorage();
-    });
-    setResources();
+setInterval(function(){
+    //localStorage.clear();
+    //buildings.forEach((building)=>{
+    //    building.updateStorage();
+    //});
+    //setResources();
 }, 1000);
 
-setInterval(()=> {
+setInterval(function(){
     getPrice();
 }, 60000)
