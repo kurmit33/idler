@@ -76,7 +76,7 @@ class PowerPlant{
 
     production(){
         if (this.buildings==0) return 0;
-        else return (this.buildings*(this.level+1)*this.multiplier);
+        else return (this.buildings*(this.level+1)*this.multiplier)/10;
     }
 
     buildPrice(){
@@ -137,7 +137,7 @@ class GreenPowerPlant extends PowerPlant{
 
 const buildings = [
     new GreenPowerPlant('.wind', 1),
-    new PowerPlant('.solar', 10),
+    new GreenPowerPlant('.solar', 10),
 ];
 
 function offlineProduction(){

@@ -12,9 +12,9 @@ body{
     align-items: center;
 }
 
-.money, .electricty, .greenCer{
+/*.money, .electricty, .greenCer{
 
-}
+}*/
 
 .rows{
     display: flex;
