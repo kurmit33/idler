@@ -5,6 +5,10 @@ let electrictyPrice = 0;
 let greenPrice = 0;
 let engineers = 0;
 let intervalTime = 100;
+let eventName;
+let eventMultipiler = 0;
+let timeStartEvent = 0;
+let timeFinishEvent = 0;
 
 let hidden, visibilityChange;
 if (typeof document.hidden !== "undefined") {  
@@ -45,7 +49,7 @@ function multiSpace(num){
     return multipilerSpace;
 }
 
-function fail(text){
+function fail(text, timeOn){
     let alert = document.querySelector("#alert");
     alert.innerHTML = text;
     alert.classList.remove('close');
@@ -54,7 +58,7 @@ function fail(text){
         alert.classList.remove('open');
         alert.classList.add('close');
         alert.innerHTML = "";
-    }, 2000);
+    }, timeOn);
 }
 
 function updateResources(){
@@ -79,9 +83,13 @@ function getResources(){
     engineers = Number(localStorage.getItem('engineers'));
 }
 
+function randomus(mini, maxiu, multi){
+    return Number((Math.floor(Math.random() * (maxiu - mini)) + mini)*multi);
+}
+
 function getPrice(){
-    electrictyPrice = Number((Math.floor(Math.random() * (35 - 10)) + 10)/100).toFixed(2);
-    greenPrice = Number((Math.floor(Math.random() * (150 - 10)) + 10)).toFixed(2);
+    electrictyPrice = Number(randomus(10, 35, 0.01).toFixed(2));
+    greenPrice = Number(randomus(350, 700, 1).toFixed(2));
     document.querySelector('.priceElectricty').innerHTML = "Electricty price: "+ electrictyPrice;
     document.querySelector('.priceGreenCer').innerHTML = "Green price: "+ greenPrice;
 }
@@ -125,9 +133,11 @@ class PowerPlant{
         return Number(this.freeSpace*(this.level+1));
     }
 
-    production(){
+    production(name, multi){
+        let eventMulti = 0;
+        if(this.name == name) eventMulti = multi;
         let product = Number((this.buildings*(this.level+1)*this.multiplier)/100);
-        return Number(product+(product*engineers*0.02)).toFixed(3);
+        return Number(product+(product*engineers*0.02)+(product*eventMulti)).toFixed(3);
     }
 
     buildPrice(){
@@ -140,7 +150,7 @@ class PowerPlant{
             this.buildings++;
             this.update();
         }
-        else fail("You need more money!");
+        else fail("You need more money!", 2000);
     }
 
     upgradePrice(){
@@ -153,7 +163,7 @@ class PowerPlant{
             this.level++;
             this.update();
         }
-        else fail("You need more money!");
+        else fail("You need more money!", 2000);
     }
 
     getStorage(){
@@ -178,22 +188,26 @@ class GreenPowerPlant extends PowerPlant{
                 }
                 this.update();
             }
-            else fail("You need more money!");
+            else fail("You need more money!", 2000);
         }
-        else fail("You need more free space!");
+        else fail("You need more free space!", 2000);
     }
 }
 
 class ConvencionalPowerPlant extends PowerPlant{
     constructor(name, multiplier){
         super(name, multiplier);
-        this.green = 10;
+        this.green = 10*multiSpace(multiplier);
     }
 
     update(){
         super.update();
         document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen();
         document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen();
+    }
+
+    production(name, multi){
+        return Number(super.production(name, multi)*100)
     }
 
     priceGreen(){
@@ -212,9 +226,9 @@ class ConvencionalPowerPlant extends PowerPlant{
                 this.buildings++;
                 this.update();
             }
-            else fail("You need more money or Green Certification!");
+            else fail("You need more money or Green Certification!", 2000);
         }
-        else fail("You need more free space!");
+        else fail("You need more free space!", 2000);
     }
 
     upgrade(m){
@@ -224,7 +238,38 @@ class ConvencionalPowerPlant extends PowerPlant{
             this.level++;
             this.update();
         }
-        else fail("You need more money or Green Certification!");
+        else fail("You need more money or Green Certification!", 2000);
+    }
+}
+
+class Event{
+    constructor(name, title, chanceMin, chanceMax, workTime){
+        this.name = name;
+        this.title = title;
+        this.chanceMin = chanceMin;
+        this.chanceMax = chanceMax;
+        this.workTime = workTime;
+        this.lessOrMore= "";
+    }
+    goodOrBad(){
+        if(randomus(1, 2, 1)==1) {
+            this.lessOrMore = "more energy. The Multiplier is ";
+            return Number(randomus(10, 50, 0.01).toFixed(2));
+        }
+        else {
+        this.lessOrMore = "less energy. The Multiplier is ";
+           return Number(-randomus(10, 50, 0.01).toFixed(2));
+        }
+    }
+    isOn(randomNum){
+        if(randomNum == 99) hardReset(10);
+        else if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
+            timeStartEvent = Date.now();
+            timeFinishEvent = Date.now()+this.workTime;
+            eventName = this.name;
+            eventMultipiler = this.goodOrBad();
+            fail((this.title+this.lessOrMore+eventMultipiler), 10000);
+        }
     }
 }
 
@@ -233,12 +278,17 @@ const buildings = [
     new GreenPowerPlant('.solar', 10),
     new ConvencionalPowerPlant('.coal', 1000),
 ];
-
+const events = [
+    new Event('.wind', "Wind Turbin produce ", 1, 10, 120000),
+    new Event('.solar', "Solar panel produce ", 20, 30, 120000),
+    new Event('.coal', "Coal power plant produce ", 40, 50, 120000),
+    new Event('WorldEnd', "World is END!!!! ", 99, 100, 120000),
+];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
     let newElectricty = 0;
     for(const building of buildings){
-        newElectricty += Number(building.production()*timeDiff);
+        newElectricty += Number(building.production(eventName, eventMultipiler)*timeDiff);
     }
     electricty += newElectricty;
 }
@@ -314,12 +364,27 @@ window.addEventListener('unload', function(){
 setInterval(function(){
     let newElectricty = 0;
     for(const building of buildings){
-        newElectricty += Number(building.production());
+        newElectricty += Number(building.production(eventName, eventMultipiler));
     }
     electricty = Number((electricty + newElectricty).toFixed(3));
     updateResources();
 }, intervalTime);
 
 setInterval(function(){
+    if(timeFinishEvent<Date.now()){
+        eventName = "";
+        eventMultipiler = 0;
+    }
+}, 100);
+
+setInterval(function(){
     getPrice();
-}, 60000)
+}, 60000);
+
+setInterval(function(){
+    if(Date.now()>timeFinishEvent){
+        for(const event of events){
+            event.isOn(randomus(1, 100, 1));
+        }
+    }
+}, 300000);
