@@ -95,7 +95,7 @@ class PowerPlant{
     }
 
     production(){
-        let product = Number((this.buildings*(this.level+1)*this.multiplier)/(100*multiSpace(this.multiplier)));
+        let product = Number((this.buildings*(this.level+1)*this.multiplier)/100);
         return Number(product+(product*engineers*0.02)).toFixed(3);
     }
 
