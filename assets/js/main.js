@@ -92,7 +92,7 @@ class PowerPlant{
     }
 
     production(){
-        return (this.buildings*(this.level+1)*this.multiplier)/100;
+        return (this.buildings*(this.level+1)*this.multiplier)/(100*multipilerSpace(this.multiplier));
     }
 
     buildPrice(){
@@ -281,7 +281,7 @@ setInterval(function(){
     });
     electricty = Number((electricty + newElectricty).toFixed(3));
     updateResources();
-}, 100);
+}, 50);
 
 setInterval(function(){
     getPrice();
