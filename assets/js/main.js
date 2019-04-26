@@ -92,7 +92,7 @@ class PowerPlant{
     }
 
     production(){
-        return (this.buildings*(this.level+1)*this.multiplier)/(100*multipilerSpace(this.multiplier));
+        return (this.buildings*(this.level+1)*this.multiplier)/(100*multiSpace(this.multiplier));
     }
 
     buildPrice(){
