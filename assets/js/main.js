@@ -4,6 +4,37 @@ let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
 let engineers = 0;
+let intervalTime = 100;
+
+let hidden, visibilityChange;
+if (typeof document.hidden !== "undefined") {  
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+} 
+else if (typeof document.msHidden !== "undefined") {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+} 
+else if (typeof document.webkitHidden !== "undefined") {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
+}
+
+function changeInterval(){
+    if(document[hidden]){
+        intervalTime = 2000;
+    }
+    else{
+        intervalTime = 100;
+    }
+}
+
+if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+    console.log("This demo requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+} 
+else { 
+    document.addEventListener(visibilityChange, changeInterval(), false);
+}
 
 function multiSpace(num){
     let multipilerSpace = 1;
@@ -206,23 +237,23 @@ const buildings = [
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
     let newElectricty = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         newElectricty += Number(building.production()*timeDiff);
-    });
+    }
     electricty += newElectricty;
 }
 
 window.onload = function(){
     if(localStorage.length != 0){
-        buildings.forEach(function(building){
+        for(const building of buildings){
             building.getStorage();
-        });
+        }
         getResources();
         offlineProduction();
     }
-    buildings.forEach(function(building){
+    for(const building of buildings){
         building.update();
-    });
+    }
     updateResources();
     getPrice();
 }
@@ -232,32 +263,32 @@ function hardReset(num){
     money = 5;
     electricty = 0;
     greenCertification = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         building.level = 0;
         building.buildings = 0;
         building.update();
-    });
+    }
     engineers = num;
 }
 
 function softReset(){
     let tempBuildings = 0;
     let tempEnginiers = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         tempBuildings += building.buildings;
-    });
+    }
     tempEnginiers = (tempBuildings/2000).toFixed();
     hardReset(tempEnginiers);
 }
 
-buildings.forEach(function(building){
+for(const building of buildings){
     document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
         building.build(money);
     });
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
         building.upgrade(money);
     });    
-});
+}
 
 document.querySelector('.hardReset').addEventListener('click', function(){
     hardReset(0);
@@ -274,20 +305,20 @@ document.querySelector('.sellgreenCer').addEventListener('click', function(){
 
 window.addEventListener('unload', function(){
     localStorage.clear();
-    buildings.forEach(function(building){
+    for(const building of buildings){
         building.updateStorage();
-    });
+    }
     setResources();
 });
 
 setInterval(function(){
     let newElectricty = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         newElectricty += Number(building.production());
-    });
+    }
     electricty = Number((electricty + newElectricty).toFixed(3));
     updateResources();
-}, 50);
+}, intervalTime);
 
 setInterval(function(){
     getPrice();
