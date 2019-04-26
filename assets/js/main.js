@@ -3,7 +3,7 @@ let electricty = 0;
 let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
-let engineer = 0;
+let engineers = 0;
 
 function multiSpace(num){
     let multipilerSpace = 1;
@@ -19,7 +19,7 @@ function fail(text){
     alert.innerHTML = text;
     alert.classList.remove('close');
     alert.classList.add('open');
-    setTimeout(()=>{
+    setTimeout(function(){
         alert.classList.remove('open');
         alert.classList.add('close');
         alert.innerHTML = "";
@@ -30,6 +30,7 @@ function updateResources(){
     document.querySelector(".money").innerHTML='Money: '+money;
     document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
     document.querySelector(".greenCer").innerHTML='Green certification: '+greenCertification;
+    document.querySelector(".enginengineersier").innerHTML='Engineers: '+engineers;
 }
 
 function setResources(){
@@ -37,12 +38,14 @@ function setResources(){
     localStorage.setItem('electricty', electricty);
     localStorage.setItem('greenCertification', greenCertification);
     localStorage.setItem('lastTime', Date.now());
+    localStorage.setItem('engineers', engineers);
 }
 
 function getResources(){
     money = Number(localStorage.getItem('money'));
     electricty = Number(localStorage.getItem('electricty'));
     greenCertification = Number(localStorage.getItem('greenCertification'));
+    engineers = Number(localStorage.getItem('engineers'));
 }
 
 function getPrice(){
@@ -92,7 +95,8 @@ class PowerPlant{
     }
 
     production(){
-        return (this.buildings*(this.level+1)*this.multiplier)/(100*multiSpace(this.multiplier));
+        let product = Number((this.buildings*(this.level+1)*this.multiplier)/(100*multiSpace(this.multiplier)));
+        return Number(product+(product*engineers*0.02)).toFixed(3);
     }
 
     buildPrice(){
@@ -147,10 +151,6 @@ class GreenPowerPlant extends PowerPlant{
         }
         else fail("You need more free space!");
     }
-
-    production(){
-        return (super.production()+Number(super.production()*greenCertification*0.001)).toFixed(3);
-    }
 }
 
 class ConvencionalPowerPlant extends PowerPlant{
@@ -177,8 +177,8 @@ class ConvencionalPowerPlant extends PowerPlant{
         if(this.space() > this.buildings){
             if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen())){
                 money = Number((money - this.buildPrice()).toFixed(5));
-                this.buildings++;
                 greenCertification = greenCertification-this.priceGreen();
+                this.buildings++;
                 this.update();
             }
             else fail("You need more money or Green Certification!");
@@ -189,15 +189,11 @@ class ConvencionalPowerPlant extends PowerPlant{
     upgrade(m){
         if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen())){
             money = Number((money - this.upgradePrice()).toFixed(5));
-            this.level++;
             greenCertification = greenCertification-this.upgradePriceGreen();
+            this.level++;
             this.update();
         }
         else fail("You need more money or Green Certification!");
-    }
-
-    production(){
-        return (super.production()+Number(super.production()*greenCertification*0.002)).toFixed(3);
     }
 }
 
@@ -231,32 +227,43 @@ window.onload = function(){
     getPrice();
 }
 
-function hardReset(event){
+function hardReset(num){
     localStorage.clear();
     money = 5;
     electricty = 0;
     greenCertification = 0;
-    buildings.forEach((building)=>{
+    buildings.forEach(function(building){
         building.level = 0;
         building.buildings = 0;
         building.update();
     });
-    if(event == true){
-        engineers = 10;
-    }
+    engineers = num;
+}
+
+function softReset(){
+    let tempBuildings = 0;
+    let tempEnginiers = 0;
+    buildings.forEach(function(building){
+        tempBuildings += building.buildings;
+    });
+    tempEnginiers = (tempBuildings/2000).toFixed();
+    hardReset(tempEnginiers);
 }
 
 buildings.forEach(function(building){
-    document.querySelector(`${building.name} .build`).addEventListener('click', ()=>{ 
+    document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
         building.build(money);
     });
-    document.querySelector(`${building.name} .upgrade`).addEventListener('click', ()=>{ 
+    document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
         building.upgrade(money);
     });    
 });
 
 document.querySelector('.hardReset').addEventListener('click', function(){
-    hardReset(false);
+    hardReset(0);
+});
+document.querySelector('.softReset').addEventListener('click', function(){
+    softReset();
 });
 document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
@@ -267,12 +274,11 @@ document.querySelector('.sellgreenCer').addEventListener('click', function(){
 
 window.addEventListener('unload', function(){
     localStorage.clear();
-    buildings.forEach((building)=>{
+    buildings.forEach(function(building){
         building.updateStorage();
     });
     setResources();
 });
-
 
 setInterval(function(){
     let newElectricty = 0;
