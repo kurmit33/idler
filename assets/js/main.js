@@ -30,7 +30,7 @@ function updateResources(){
     document.querySelector(".money").innerHTML='Money: '+money;
     document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
     document.querySelector(".greenCer").innerHTML='Green certification: '+greenCertification;
-    document.querySelector(".enginengineersier").innerHTML='Engineers: '+engineers;
+    document.querySelector(".engineers").innerHTML='Engineers: '+engineers;
 }
 
 function setResources(){
