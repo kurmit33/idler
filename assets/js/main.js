@@ -3,6 +3,7 @@ let electricty = 0;
 let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
+let engineer = 0;
 
 function multiSpace(num){
     let multipilerSpace = 1;
@@ -73,7 +74,7 @@ class PowerPlant{
         this.multiplier = multiplier;
         this.name = name;
         this.price = 5;
-        this.space = 10/multiSpace(multiplier);
+        this.freeSpace = 20/multiSpace(multiplier);
     }
 
     update(){
@@ -82,10 +83,11 @@ class PowerPlant{
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
         document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice();
         document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
+        document.querySelector(`${this.name} .space`).innerHTML=this.space();
     }
 
-    maxBuildings(){
-        return Number(this.space + (this.space*this.level/2));
+    space(){
+        return Number(this.freeSpace*(this.level+1));
     }
 
     production(){
@@ -131,7 +133,7 @@ class PowerPlant{
 
 class GreenPowerPlant extends PowerPlant{
     build(m){
-        if(this.space > this.buildings){
+        if(this.space() > this.buildings){
             if(m>=this.buildPrice()){
                 money = Number((money - this.buildPrice()).toFixed(5));
                 this.buildings++;
@@ -142,7 +144,7 @@ class GreenPowerPlant extends PowerPlant{
             }
             else fail("You need more money!");
         }
-        else fail("You need more space!");
+        else fail("You need more free space!");
     }
 
     production(){
@@ -167,7 +169,7 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
     
     build(m){
-        if(this.space > this.buildings){
+        if(this.space() > this.buildings){
             if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen)){
                 money = Number((money - this.buildPrice()).toFixed(5));
                 this.buildings++;
@@ -175,7 +177,7 @@ class ConvencionalPowerPlant extends PowerPlant{
             }
             else fail("You need more money or Green Certification!");
         }
-        else fail("You need more space!");
+        else fail("You need more free space!");
     }
 
     upgrade(m){
@@ -221,6 +223,21 @@ window.onload = function(){
     getPrice();
 }
 
+function hardReset(event){
+    localStorage.clear();
+    money = 5;
+    electricty = 0;
+    greenCertification = 0;
+    buildings.forEach((building)=>{
+        building.level = 0;
+        building.buildings = 0;
+        building.update();
+    });
+    if(event == true){
+        engineers = 10;
+    }
+}
+
 buildings.forEach(function(building){
     document.querySelector(`${building.name} .build`).addEventListener('click', ()=>{ 
         building.build(money);
@@ -230,6 +247,9 @@ buildings.forEach(function(building){
     });    
 });
 
+document.querySelector('.hardReset').addEventListener('click', function(){
+    hardReset(false);
+});
 document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
 });
@@ -244,6 +264,7 @@ window.addEventListener('unload', function(){
     });
     setResources();
 });
+
 
 setInterval(function(){
     let newElectricty = 0;
