@@ -78,6 +78,7 @@ class PowerPlant{
     }
 
     update(){
+        updateResources();
         document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
         document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
@@ -159,10 +160,18 @@ class ConvencionalPowerPlant extends PowerPlant{
         this.upgradePriceGreen = 0;
         this.green = 10;
     }
+
+    update(){
+        super.update();
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen ;
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen;
+    }
+
     buildPrice(){
         this.priceGreen = this.green * (this.buildings+1);
         return super.buildPrice();
     }
+
     upgradePrice(){
         this.upgradePriceGreen = this.green * (this.level+1);
         return super.upgradePrice();
@@ -173,6 +182,7 @@ class ConvencionalPowerPlant extends PowerPlant{
             if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen)){
                 money = Number((money - this.buildPrice()).toFixed(5));
                 this.buildings++;
+                greenCertification = greenCertification-this.priceGreen;
                 this.update();
             }
             else fail("You need more money or Green Certification!");
@@ -184,6 +194,7 @@ class ConvencionalPowerPlant extends PowerPlant{
         if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen)){
             money = Number((money - this.upgradePrice()).toFixed(5));
             this.level++;
+            greenCertification = greenCertification-this.upgradePriceGreen;
             this.update();
         }
         else fail("You need more money or Green Certification!");
@@ -197,6 +208,7 @@ class ConvencionalPowerPlant extends PowerPlant{
 const buildings = [
     new GreenPowerPlant('.wind', 1),
     new GreenPowerPlant('.solar', 10),
+    new ConvencionalPowerPlant('.coal', 1000),
 ];
 
 function offlineProduction(){

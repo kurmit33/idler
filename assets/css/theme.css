@@ -51,6 +51,12 @@ body{
     margin: 0px 5px;
 }
 
+.stat .columns{
+    margin: 0px;
+}
+.stat .columns .stat{
+    margin-left: 10px;
+}
 #wt{
     margin: 5px;
     background-image: url("../gfx/wt.png");
