@@ -3,7 +3,38 @@ let electricty = 0;
 let greenCertification = 0;
 let electrictyPrice = 0;
 let greenPrice = 0;
-let engineer = 0;
+let engineers = 0;
+let intervalTime = 100;
+
+let hidden, visibilityChange;
+if (typeof document.hidden !== "undefined") {  
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+} 
+else if (typeof document.msHidden !== "undefined") {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+} 
+else if (typeof document.webkitHidden !== "undefined") {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
+}
+
+function changeInterval(){
+    if(document[hidden]){
+        intervalTime = 2000;
+    }
+    else{
+        intervalTime = 100;
+    }
+}
+
+if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+    console.log("This demo requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+} 
+else { 
+    document.addEventListener(visibilityChange, changeInterval(), false);
+}
 
 function multiSpace(num){
     let multipilerSpace = 1;
@@ -19,7 +50,7 @@ function fail(text){
     alert.innerHTML = text;
     alert.classList.remove('close');
     alert.classList.add('open');
-    setTimeout(()=>{
+    setTimeout(function(){
         alert.classList.remove('open');
         alert.classList.add('close');
         alert.innerHTML = "";
@@ -30,6 +61,7 @@ function updateResources(){
     document.querySelector(".money").innerHTML='Money: '+money;
     document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
     document.querySelector(".greenCer").innerHTML='Green certification: '+greenCertification;
+    document.querySelector(".engineers").innerHTML='Engineers: '+engineers;
 }
 
 function setResources(){
@@ -37,12 +69,14 @@ function setResources(){
     localStorage.setItem('electricty', electricty);
     localStorage.setItem('greenCertification', greenCertification);
     localStorage.setItem('lastTime', Date.now());
+    localStorage.setItem('engineers', engineers);
 }
 
 function getResources(){
     money = Number(localStorage.getItem('money'));
     electricty = Number(localStorage.getItem('electricty'));
     greenCertification = Number(localStorage.getItem('greenCertification'));
+    engineers = Number(localStorage.getItem('engineers'));
 }
 
 function getPrice(){
@@ -92,7 +126,8 @@ class PowerPlant{
     }
 
     production(){
-        return (this.buildings*(this.level+1)*this.multiplier)/(100*multiSpace(this.multiplier));
+        let product = Number((this.buildings*(this.level+1)*this.multiplier)/100);
+        return Number(product+(product*engineers*0.02)).toFixed(3);
     }
 
     buildPrice(){
@@ -147,10 +182,6 @@ class GreenPowerPlant extends PowerPlant{
         }
         else fail("You need more free space!");
     }
-
-    production(){
-        return (super.production()+Number(super.production()*greenCertification*0.001)).toFixed(3);
-    }
 }
 
 class ConvencionalPowerPlant extends PowerPlant{
@@ -177,8 +208,8 @@ class ConvencionalPowerPlant extends PowerPlant{
         if(this.space() > this.buildings){
             if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen())){
                 money = Number((money - this.buildPrice()).toFixed(5));
-                this.buildings++;
                 greenCertification = greenCertification-this.priceGreen();
+                this.buildings++;
                 this.update();
             }
             else fail("You need more money or Green Certification!");
@@ -189,15 +220,11 @@ class ConvencionalPowerPlant extends PowerPlant{
     upgrade(m){
         if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen())){
             money = Number((money - this.upgradePrice()).toFixed(5));
-            this.level++;
             greenCertification = greenCertification-this.upgradePriceGreen();
+            this.level++;
             this.update();
         }
         else fail("You need more money or Green Certification!");
-    }
-
-    production(){
-        return (super.production()+Number(super.production()*greenCertification*0.002)).toFixed(3);
     }
 }
 
@@ -210,53 +237,64 @@ const buildings = [
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
     let newElectricty = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         newElectricty += Number(building.production()*timeDiff);
-    });
+    }
     electricty += newElectricty;
 }
 
 window.onload = function(){
     if(localStorage.length != 0){
-        buildings.forEach(function(building){
+        for(const building of buildings){
             building.getStorage();
-        });
+        }
         getResources();
         offlineProduction();
     }
-    buildings.forEach(function(building){
+    for(const building of buildings){
         building.update();
-    });
+    }
     updateResources();
     getPrice();
 }
 
-function hardReset(event){
+function hardReset(num){
     localStorage.clear();
     money = 5;
     electricty = 0;
     greenCertification = 0;
-    buildings.forEach((building)=>{
+    for(const building of buildings){
         building.level = 0;
         building.buildings = 0;
         building.update();
-    });
-    if(event == true){
-        engineers = 10;
     }
+    engineers = num;
 }
 
-buildings.forEach(function(building){
-    document.querySelector(`${building.name} .build`).addEventListener('click', ()=>{ 
+function softReset(){
+    let tempBuildings = 0;
+    let tempEnginiers = 0;
+    for(const building of buildings){
+        tempBuildings += building.buildings;
+    }
+    tempEnginiers = (tempBuildings/2000).toFixed();
+    hardReset(tempEnginiers);
+}
+
+for(const building of buildings){
+    document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
         building.build(money);
     });
-    document.querySelector(`${building.name} .upgrade`).addEventListener('click', ()=>{ 
+    document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
         building.upgrade(money);
     });    
-});
+}
 
 document.querySelector('.hardReset').addEventListener('click', function(){
-    hardReset(false);
+    hardReset(0);
+});
+document.querySelector('.softReset').addEventListener('click', function(){
+    softReset();
 });
 document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
@@ -267,21 +305,20 @@ document.querySelector('.sellgreenCer').addEventListener('click', function(){
 
 window.addEventListener('unload', function(){
     localStorage.clear();
-    buildings.forEach((building)=>{
+    for(const building of buildings){
         building.updateStorage();
-    });
+    }
     setResources();
 });
 
-
 setInterval(function(){
     let newElectricty = 0;
-    buildings.forEach(function(building){
+    for(const building of buildings){
         newElectricty += Number(building.production());
-    });
+    }
     electricty = Number((electricty + newElectricty).toFixed(3));
     updateResources();
-}, 50);
+}, intervalTime);
 
 setInterval(function(){
     getPrice();
