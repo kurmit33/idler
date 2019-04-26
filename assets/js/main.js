@@ -156,33 +156,29 @@ class GreenPowerPlant extends PowerPlant{
 class ConvencionalPowerPlant extends PowerPlant{
     constructor(name, multiplier){
         super(name, multiplier);
-        this.buildPriceGreen = 0;
-        this.upgradePriceGreen = 0;
         this.green = 10;
     }
 
     update(){
         super.update();
-        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen ;
-        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen;
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen();
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen();
     }
 
-    buildPrice(){
-        this.priceGreen = this.green * (this.buildings+1);
-        return super.buildPrice();
+    priceGreen(){
+        return Number(this.green * (this.buildings+1));
     }
 
-    upgradePrice(){
-        this.upgradePriceGreen = this.green * (this.level+1);
-        return super.upgradePrice();
+    upgradePriceGreen(){
+        return Number(this.green * (this.level+1));
     }
     
     build(m){
         if(this.space() > this.buildings){
-            if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen)){
+            if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen())){
                 money = Number((money - this.buildPrice()).toFixed(5));
                 this.buildings++;
-                greenCertification = greenCertification-this.priceGreen;
+                greenCertification = greenCertification-this.priceGreen();
                 this.update();
             }
             else fail("You need more money or Green Certification!");
@@ -191,10 +187,10 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
 
     upgrade(m){
-        if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen)){
+        if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen())){
             money = Number((money - this.upgradePrice()).toFixed(5));
             this.level++;
-            greenCertification = greenCertification-this.upgradePriceGreen;
+            greenCertification = greenCertification-this.upgradePriceGreen();
             this.update();
         }
         else fail("You need more money or Green Certification!");
