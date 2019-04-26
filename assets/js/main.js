@@ -133,8 +133,8 @@ class PowerPlant{
     }
 
     production(name, multi){
+        let eventMulti = 0;
         if(this.name == name) eventMulti = multi;
-        else eventMulti = 0;
         let product = Number((this.buildings*(this.level+1)*this.multiplier)/100);
         return Number(product+(product*engineers*0.02)+(product*eventMulti)).toFixed(3);
     }
@@ -196,13 +196,17 @@ class GreenPowerPlant extends PowerPlant{
 class ConvencionalPowerPlant extends PowerPlant{
     constructor(name, multiplier){
         super(name, multiplier);
-        this.green = 10;
+        this.green = 10*multiSpace(multiplier);
     }
 
     update(){
         super.update();
         document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen();
         document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen();
+    }
+
+    production(name, multi){
+        return Number(super.production(name, multi)*100)
     }
 
     priceGreen(){
@@ -244,18 +248,26 @@ class Event{
         this.chanceMin = chanceMin;
         this.chanceMax = chanceMax;
         this.workTime = workTime;
+        this.lessOrMore= "";
     }
     goodOrBad(){
-        if(randomus(1, 2, 1)==1) return Number(randomus(10, 50, 0.01).toFixed(2));
-        else return -Number(randomus(10, 50, 0.01).toFixed(2));
+        if(randomus(1, 2, 1)==1) {
+            this.lessOrMore = "more energy. The Multiplier is ";
+            return Number(randomus(10, 50, 0.01).toFixed(2));
+        }
+        else {
+        this.lessOrMore = "less energy. The Multiplier is ";
+           return Number(-randomus(10, 50, 0.01).toFixed(2));
+        }
     }
     isOn(randomNum){
-        if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
-            fail(this.title, 10000);
+        if(randomNum == 99) hardReset(10);
+        else if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
             timeStartEvent = Date.now();
             timeFinishEvent = Date.now()+this.workTime;
             eventName = this.name;
-            eventMultipiler = goodOrBad(
+            eventMultipiler = goodOrBad();
+            fail((this.title+this.lessOrMore+eventMultipiler), 10000);
         }
     }
 }
@@ -265,7 +277,12 @@ const buildings = [
     new GreenPowerPlant('.solar', 10),
     new ConvencionalPowerPlant('.coal', 1000),
 ];
-
+const events = [
+    new Event('.wind', "Wind Turbin produce ", 1, 10, 120000),
+    new Event('.solar', "Solar panel produce ", 20, 30, 120000),
+    new Event('.coal', "Coal power plant produce ", 40, 50, 120000),
+    new Event('WorldEnd', "World is END!!!! ", 99, 100, 120000),
+];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
     let newElectricty = 0;
