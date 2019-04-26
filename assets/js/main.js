@@ -252,7 +252,7 @@ class Event{
         this.lessOrMore= "";
     }
     goodOrBad(){
-        if(randomus(1, 2, 1)==1) {
+        if(randomus(1, 3, 1)==1) {
             this.lessOrMore = "more energy. The Multiplier is ";
             return Number(randomus(10, 50, 0.01).toFixed(2));
         }
@@ -262,13 +262,18 @@ class Event{
         }
     }
     isOn(randomNum){
-        if(randomNum == 99) hardReset(10);
+        if((randomNum>=98) && (this.name == WorldEnd)) {
+            hardReset(10);
+            fail(this.title, 15000);
+            console.log(randomNum);
+            console.log(this.title);
+        }
         else if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
             timeStartEvent = Date.now();
             timeFinishEvent = Date.now()+this.workTime;
             eventName = this.name;
             eventMultipiler = this.goodOrBad();
-            fail((this.title+this.lessOrMore+eventMultipiler), 10000);
+            fail((this.title+this.lessOrMore+eventMultipiler), 25000);
         }
     }
 }
@@ -282,7 +287,7 @@ const events = [
     new Event('.wind', "Wind Turbin produce ", 1, 10, 120000),
     new Event('.solar', "Solar panel produce ", 20, 30, 120000),
     new Event('.coal', "Coal power plant produce ", 40, 50, 120000),
-    new Event('WorldEnd', "World is END!!!! ", 99, 100, 120000),
+    new Event('WorldEnd', "World is END!!!! ", 98, 100, 100),
 ];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
@@ -318,7 +323,7 @@ function hardReset(num){
         building.buildings = 0;
         building.update();
     }
-    engineers = num;
+    engineers += num;
 }
 
 function softReset(){
@@ -383,8 +388,9 @@ setInterval(function(){
 
 setInterval(function(){
     if(Date.now()>timeFinishEvent){
+        let number = randomus(1, 100, 1);
         for(const event of events){
-            event.isOn(randomus(1, 100, 1));
+            event.isOn(number);
         }
     }
 }, 300000);
