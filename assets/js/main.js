@@ -387,4 +387,4 @@ setInterval(function(){
             event.isOn(randomus(1, 100, 1));
         }
     }
-}, 3000);
+}, 300000);
