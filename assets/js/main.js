@@ -197,7 +197,7 @@ class GreenPowerPlant extends PowerPlant{
 class ConvencionalPowerPlant extends PowerPlant{
     constructor(name, multiplier){
         super(name, multiplier);
-        this.green = 10*multiSpace(multiplier);
+        this.green = 10;
     }
 
     update(){
