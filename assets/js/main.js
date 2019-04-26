@@ -8,6 +8,7 @@ let intervalTime = 100;
 let eventName;
 let eventMultipiler = 0;
 let timeStartEvent = 0;
+let timeFinishEvent = 0;
 
 let hidden, visibilityChange;
 if (typeof document.hidden !== "undefined") {  
@@ -83,12 +84,12 @@ function getResources(){
 }
 
 function randomus(mini, maxiu, multi){
-    return Number((Math.floor(Math.random() * (maxiu - mini)) + mini)/multi);
+    return Number((Math.floor(Math.random() * (maxiu - mini)) + mini)*multi);
 }
 
 function getPrice(){
     electrictyPrice = Number(randomus(10, 35, 0.01).toFixed(2));
-    greenPrice = Number(randomus(10, 150, 1).toFixed(2));
+    greenPrice = Number(randomus(350, 700, 1).toFixed(2));
     document.querySelector('.priceElectricty').innerHTML = "Electricty price: "+ electrictyPrice;
     document.querySelector('.priceGreenCer').innerHTML = "Green price: "+ greenPrice;
 }
@@ -266,7 +267,7 @@ class Event{
             timeStartEvent = Date.now();
             timeFinishEvent = Date.now()+this.workTime;
             eventName = this.name;
-            eventMultipiler = goodOrBad();
+            eventMultipiler = this.goodOrBad();
             fail((this.title+this.lessOrMore+eventMultipiler), 10000);
         }
     }
@@ -370,5 +371,20 @@ setInterval(function(){
 }, intervalTime);
 
 setInterval(function(){
+    if(timeFinishEvent<Date.now()){
+        eventName = "";
+        eventMultipiler = 0;
+    }
+}, 100);
+
+setInterval(function(){
     getPrice();
-}, 60000)
+}, 60000);
+
+setInterval(function(){
+    if(Date.now()>timeFinishEvent){
+        for(const event of events){
+            event.isOn(randomus(1, 100, 1));
+        }
+    }
+}, 3000);
