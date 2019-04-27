@@ -9,6 +9,8 @@ let eventName;
 let eventMultipiler = 0;
 let timeStartEvent = 0;
 let timeFinishEvent = 0;
+let multiplierBuild = 1;
+let lastMultiplierBuild = 1;
 
 let hidden, visibilityChange;
 if (typeof document.hidden !== "undefined") {  
@@ -124,8 +126,8 @@ class PowerPlant{
         document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
         document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
-        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice();
-        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
+        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice(parseInt(multiplierBuild));
+        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice(parseInt(multiplierBuild));
         document.querySelector(`${this.name} .space`).innerHTML=this.space();
     }
 
@@ -140,27 +142,35 @@ class PowerPlant{
         return Number(product+(product*engineers*0.02)+(product*eventMulti)).toFixed(3);
     }
 
-    buildPrice(){
-        return Number((this.price+this.buildings*3)*this.multiplier);
+    buildPrice(num){
+        let tempPrice = 0;
+        for(let i=this.buildings; i<(this.buildings+num); i++){
+            tempPrice = Number((this.price+i*3)*this.multiplier)+Number(tempPrice);
+        }
+        return tempPrice;
     }
 
     build(m){
-        if(m>=this.buildPrice()){
-            money = Number((money - this.buildPrice()).toFixed(5));
+        if(m>=this.buildPrice(num)){
+            money = Number((money - this.buildPrice(num)).toFixed(5));
             this.buildings++;
             this.update();
         }
         else fail("You need more money!", 2000);
     }
 
-    upgradePrice(){
-        return (1+this.level)*50*this.price*this.multiplier;
+    upgradePrice(num){
+        let tempPrice = 0;
+        for(let i=this.level; i<(this.level+num); i++){
+            tempPrice = Number((1+i)*50*this.price*this.multiplier)+Number(tempPrice);
+        }
+        return tempPrice; 
     }
 
-    upgrade(m){
-        if(m>=this.upgradePrice()){
-            money = Number((money - this.upgradePrice()).toFixed(5));
-            this.level++;
+    upgrade(m, num){
+        if(m>=this.upgradePrice(num)){
+            money = Number((money - this.upgradePrice(num)).toFixed(5));
+            this.level += num;
             this.update();
         }
         else fail("You need more money!", 2000);
@@ -178,14 +188,14 @@ class PowerPlant{
 }
 
 class GreenPowerPlant extends PowerPlant{
-    build(m){
-        if(this.space() > this.buildings){
-            if(m>=this.buildPrice()){
-                money = Number((money - this.buildPrice()).toFixed(5));
-                this.buildings++;
-                if(this.buildings%25==0){
-                    greenCertification++;
+    build(m, num){
+        if(this.space() >= (this.buildings+num)){
+            if(m>=this.buildPrice(num)){
+                money = Number((money - this.buildPrice(num)).toFixed(5));
+                for(let i=this.buildings; i<=(this.buildings+num); i++){
+                    if(i%25 == 0) greenCertification +=this.multiplier;
                 }
+                this.buildings += num;
                 this.update();
             }
             else fail("You need more money!", 2000);
@@ -200,30 +210,36 @@ class ConvencionalPowerPlant extends PowerPlant{
         this.green = 10;
     }
 
-    update(){
-        super.update();
-        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen();
-        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen();
-    }
-
     production(name, multi){
         return Number(super.production(name, multi)*100)
     }
 
-    priceGreen(){
-        return Number(this.green * (this.buildings+1));
+    priceGreen(num){
+        let tempBuildGreen = 0;
+        for(let i=this.buildings; i<(this.buildings+num); i++){
+            tempBuildGreen = Number(this.green * Number(i+1))+Number(tempBuildGreen);
+        }
+        return Number(tempBuildGreen);
     }
 
-    upgradePriceGreen(){
-        return Number(this.green * (this.level+1));
+    upgradePriceGreen(num){
+        let tempPrice = 0;
+        for(let i=this.level; i<(this.level+num); i++){
+            tempPrice = Number(this.green * Number(i+1)*10)+Number(tempPrice);
+        }
+        return Number(tempPrice);
     }
-    
-    build(m){
-        if(this.space() > this.buildings){
-            if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen())){
-                money = Number((money - this.buildPrice()).toFixed(5));
-                greenCertification = greenCertification-this.priceGreen();
-                this.buildings++;
+    update(){
+        super.update();
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen(parseInt(multiplierBuild));
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen(parseInt(multiplierBuild));
+    }
+    build(m, num){
+        if(this.space() >= (this.buildings+num)){
+            if((m>=this.buildPrice(num)) && (greenCertification>=this.priceGreen(num))){
+                money = Number((money - this.buildPrice(num)).toFixed(5));
+                greenCertification = greenCertification-this.priceGreen(num);
+                this.buildings += num;
                 this.update();
             }
             else fail("You need more money or Green Certification!", 2000);
@@ -231,11 +247,11 @@ class ConvencionalPowerPlant extends PowerPlant{
         else fail("You need more free space!", 2000);
     }
 
-    upgrade(m){
-        if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen())){
-            money = Number((money - this.upgradePrice()).toFixed(5));
-            greenCertification = greenCertification-this.upgradePriceGreen();
-            this.level++;
+    upgrade(m, num){
+        if((m>=this.upgradePrice(num)) && (greenCertification>=this.upgradePriceGreen(num))){
+            money = Number((money - this.upgradePrice(num)).toFixed(5));
+            greenCertification = greenCertification-this.upgradePriceGreen(num);
+            this.level += num;  
             this.update();
         }
         else fail("You need more money or Green Certification!", 2000);
@@ -262,13 +278,11 @@ class Event{
         }
     }
     isOn(randomNum){
-        if((randomNum>=98) && (this.name == WorldEnd)) {
+        if((randomNum>=100) && (this.name == 'WorldEnd')) {
             hardReset(10);
             fail(this.title, 15000);
-            console.log(randomNum);
-            console.log(this.title);
         }
-        else if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
+        if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
             timeStartEvent = Date.now();
             timeFinishEvent = Date.now()+this.workTime;
             eventName = this.name;
@@ -284,10 +298,10 @@ const buildings = [
     new ConvencionalPowerPlant('.coal', 1000),
 ];
 const events = [
-    new Event('.wind', "Wind Turbin produce ", 1, 10, 120000),
-    new Event('.solar', "Solar panel produce ", 20, 30, 120000),
-    new Event('.coal', "Coal power plant produce ", 40, 50, 120000),
-    new Event('WorldEnd', "World is END!!!! ", 98, 100, 100),
+    new Event('.wind', "Wind Turbin produce ", 1, 20, 120000),
+    new Event('.solar', "Solar panel produce ", 20, 40, 120000),
+    new Event('.coal', "Coal power plant produce ", 40, 60, 120000),
+    new Event('WorldEnd', "World is END!!!! ", 100, 101, 100),
 ];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
@@ -323,28 +337,47 @@ function hardReset(num){
         building.buildings = 0;
         building.update();
     }
-    engineers += num;
+    engineers = Number(num)+Number(engineers);
+}
+
+function check(num){
+    let tempName;
+    if(lastMultiplierBuild != multiplierBuild){
+        tempName = "#mm"+lastMultiplierBuild;
+        document.querySelector(tempName).classList.remove('radioChecked');
+        tempName = "#mm"+num;
+        document.querySelector(tempName).classList.add('radioChecked');
+        for(const building of buildings){
+            building.update();
+        }
+    }
+    lastMultiplierBuild = multiplierBuild;
 }
 
 function softReset(){
     let tempBuildings = 0;
     let tempEnginiers = 0;
     for(const building of buildings){
-        tempBuildings += building.buildings;
+        tempBuildings += Number(building.buildings);
     }
-    tempEnginiers = (tempBuildings/2000).toFixed();
+    tempEnginiers = Number(Math.floor(tempBuildings/2000));
     hardReset(tempEnginiers);
 }
 
 for(const building of buildings){
     document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
-        building.build(money);
+            building.build(money, parseInt(multiplierBuild));
     });
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
-        building.upgrade(money);
+        building.upgrade(money, parseInt(multiplierBuild));
     });    
 }
-
+for(const radio of document.querySelectorAll('.radios')){
+        radio.addEventListener('click', function(){
+            multiplierBuild = document.querySelector('input[name="multi"]:checked').value;
+        check(multiplierBuild);
+    });
+}
 document.querySelector('.hardReset').addEventListener('click', function(){
     hardReset(0);
 });
@@ -357,6 +390,7 @@ document.querySelector('.sellElectricty').addEventListener('click', function(){
 document.querySelector('.sellgreenCer').addEventListener('click', function(){
     sell('green');
 });
+
 
 window.addEventListener('unload', function(){
     localStorage.clear();
@@ -388,7 +422,7 @@ setInterval(function(){
 
 setInterval(function(){
     if(Date.now()>timeFinishEvent){
-        let number = randomus(1, 100, 1);
+        let number = randomus(1, 101, 1);
         for(const event of events){
             event.isOn(number);
         }

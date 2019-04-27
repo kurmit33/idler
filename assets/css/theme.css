@@ -3,6 +3,8 @@ body{
     color: #209781;
     font-size: 16px;
     font-family: 'Lobster', sans-serif;
+    display: flex;
+    flex-direction: column;
 }
 
 .topStat{
@@ -12,6 +14,41 @@ body{
     align-items: center;
 }
 
+.buttons{
+    margin: 20px 2%;
+    width: 96%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.radios{
+    border: 2px solid #209781;
+    background-color: #131936;
+    padding: 3px;
+    border-radius: 5px;
+    width: 30px;
+    height: auto;
+    text-align: center;
+}
+
+.radios:hover{
+    background-color: #209781;
+    color: #131936;
+    border: 2px solid #131936;
+    border-radius: 5px;
+}
+
+.radioChecked{
+    border: 2px solid red;
+    background-color: green;
+    color: black;
+}
+
+#multi1, #multi10, #multi25, #multi100{
+    display: none;
+}
 /*.money, .electricty, .greenCer{
 
 }*/
