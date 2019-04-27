@@ -145,7 +145,7 @@ class PowerPlant{
     buildPrice(num){
         let tempPrice = 0;
         for(let i=this.buildings; i<(this.buildings+num); i++){
-            tempPrice += Number((this.price+i*3)*this.multiplier);
+            tempPrice = Number((this.price+i*3)*this.multiplier)+Number(tempPrice);
         }
         return tempPrice;
     }
@@ -162,7 +162,7 @@ class PowerPlant{
     upgradePrice(num){
         let tempPrice = 0;
         for(let i=this.level; i<(this.level+num); i++){
-            tempPrice += (1+i)*50*this.price*this.multiplier;
+            tempPrice = Number((1+i)*50*this.price*this.multiplier)+Number(tempPrice);
         }
         return tempPrice; 
     }
@@ -210,32 +210,30 @@ class ConvencionalPowerPlant extends PowerPlant{
         this.green = 10;
     }
 
-    update(){
-        super.update();
-        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen(multiplierBuild);
-        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen(multiplierBuild);
-    }
-
     production(name, multi){
         return Number(super.production(name, multi)*100)
     }
 
     priceGreen(num){
-        let tempPrice = 0;
+        let tempBuildGreen = 0;
         for(let i=this.buildings; i<(this.buildings+num); i++){
-            tempPrice += Number(this.green * (i+1));
+            tempBuildGreen = Number(this.green * Number(i+1))+Number(tempBuildGreen);
         }
-        return tempPrice;
+        return Number(tempBuildGreen);
     }
 
     upgradePriceGreen(num){
         let tempPrice = 0;
         for(let i=this.level; i<(this.level+num); i++){
-            tempPrice += Number(this.green * (i+1)*10);
+            tempPrice = Number(this.green * Number(i+1)*10)+Number(tempPrice);
         }
-        return tempPrice;
+        return Number(tempPrice);
     }
-    
+    update(){
+        super.update();
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen(parseInt(multiplierBuild));
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen(parseInt(multiplierBuild));
+    }
     build(m, num){
         if(this.space() >= (this.buildings+num)){
             if((m>=this.buildPrice(num)) && (greenCertification>=this.priceGreen(num))){
@@ -280,13 +278,11 @@ class Event{
         }
     }
     isOn(randomNum){
-        if((randomNum>=100) && (this.name == WorldEnd)) {
+        if((randomNum>=100) && (this.name == 'WorldEnd')) {
             hardReset(10);
             fail(this.title, 15000);
-            console.log(randomNum);
-            console.log(this.title);
         }
-        else if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
+        if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
             timeStartEvent = Date.now();
             timeFinishEvent = Date.now()+this.workTime;
             eventName = this.name;
@@ -341,7 +337,7 @@ function hardReset(num){
         building.buildings = 0;
         building.update();
     }
-    engineers += num;
+    engineers = Number(num)+Number(engineers);
 }
 
 function check(num){
@@ -362,9 +358,9 @@ function softReset(){
     let tempBuildings = 0;
     let tempEnginiers = 0;
     for(const building of buildings){
-        tempBuildings += building.buildings;
+        tempBuildings += Number(building.buildings);
     }
-    tempEnginiers = (tempBuildings/2000).toFixed();
+    tempEnginiers = Number(Math.floor(tempBuildings/2000));
     hardReset(tempEnginiers);
 }
 
