@@ -40,6 +40,12 @@ body{
     border-radius: 5px;
 }
 
+.radioChecked{
+    border: 2px solid red;
+    background-color: green;
+    color: black;
+}
+
 #multi1, #multi10, #multi25, #multi100{
     display: none;
 }

@@ -9,6 +9,8 @@ let eventName;
 let eventMultipiler = 0;
 let timeStartEvent = 0;
 let timeFinishEvent = 0;
+let multiplierBuild = 1;
+let lastMultiplierBuild = 1;
 
 let hidden, visibilityChange;
 if (typeof document.hidden !== "undefined") {  
@@ -124,8 +126,8 @@ class PowerPlant{
         document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
         document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
         document.querySelector(`${this.name} .production`).innerHTML=this.production();
-        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice();
-        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice();
+        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice(parseInt(multiplierBuild));
+        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice(parseInt(multiplierBuild));
         document.querySelector(`${this.name} .space`).innerHTML=this.space();
     }
 
@@ -342,6 +344,20 @@ function hardReset(num){
     engineers += num;
 }
 
+function check(num){
+    let tempName;
+    if(lastMultiplierBuild != multiplierBuild){
+        tempName = "#mm"+lastMultiplierBuild;
+        document.querySelector(tempName).classList.remove('radioChecked');
+        tempName = "#mm"+num;
+        document.querySelector(tempName).classList.add('radioChecked');
+        for(const building of buildings){
+            building.update();
+        }
+    }
+    lastMultiplierBuild = multiplierBuild;
+}
+
 function softReset(){
     let tempBuildings = 0;
     let tempEnginiers = 0;
@@ -354,13 +370,18 @@ function softReset(){
 
 for(const building of buildings){
     document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
-            building.build(money, parseInt(document.querySelector(`${building.name} .build`).value));
+            building.build(money, parseInt(multiplierBuild));
     });
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
-        building.upgrade(money, parseInt(document.querySelector(`${building.name} .build`).value));
+        building.upgrade(money, parseInt(multiplierBuild));
     });    
 }
-
+for(const radio of document.querySelectorAll('.radios')){
+        radio.addEventListener('click', function(){
+            multiplierBuild = document.querySelector('input[name="multi"]:checked').value;
+        check(multiplierBuild);
+    });
+}
 document.querySelector('.hardReset').addEventListener('click', function(){
     hardReset(0);
 });
@@ -373,6 +394,7 @@ document.querySelector('.sellElectricty').addEventListener('click', function(){
 document.querySelector('.sellgreenCer').addEventListener('click', function(){
     sell('green');
 });
+
 
 window.addEventListener('unload', function(){
     localStorage.clear();
