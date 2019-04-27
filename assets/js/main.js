@@ -189,7 +189,7 @@ class PowerPlant{
 
 class GreenPowerPlant extends PowerPlant{
     build(m, num){
-        if(this.space() > (this.buildings+num)){
+        if(this.space() >= (this.buildings+num)){
             if(m>=this.buildPrice(num)){
                 money = Number((money - this.buildPrice(num)).toFixed(5));
                 for(let i=this.buildings; i<=(this.buildings+num); i++){
@@ -212,8 +212,8 @@ class ConvencionalPowerPlant extends PowerPlant{
 
     update(){
         super.update();
-        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen();
-        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen();
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen(multiplierBuild);
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen(multiplierBuild);
     }
 
     production(name, multi){
@@ -222,22 +222,22 @@ class ConvencionalPowerPlant extends PowerPlant{
 
     priceGreen(num){
         let tempPrice = 0;
-        for(let i=this.buildings; i<(num+this.buildings); i++){
-            tempPrice +=Number(this.green * (i+1));
+        for(let i=this.buildings; i<(this.buildings+num); i++){
+            tempPrice += Number(this.green * (i+1));
         }
-        return Number(tempPrice);
+        return tempPrice;
     }
 
     upgradePriceGreen(num){
         let tempPrice = 0;
-        for(let i=this.level; i<(num+this.level); i++){
-            tempPrice +=Number(this.green * (i+1));
+        for(let i=this.level; i<(this.level+num); i++){
+            tempPrice += Number(this.green * (i+1)*10);
         }
-        return Number(tempPrice);
+        return tempPrice;
     }
     
     build(m, num){
-        if(this.space() > this.buildings){
+        if(this.space() >= (this.buildings+num)){
             if((m>=this.buildPrice(num)) && (greenCertification>=this.priceGreen(num))){
                 money = Number((money - this.buildPrice(num)).toFixed(5));
                 greenCertification = greenCertification-this.priceGreen(num);
