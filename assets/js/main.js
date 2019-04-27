@@ -298,10 +298,10 @@ const buildings = [
     new ConvencionalPowerPlant('.coal', 1000),
 ];
 const events = [
-    new Event('.wind', "Wind Turbin produce ", 1, 10, 120000),
-    new Event('.solar', "Solar panel produce ", 20, 30, 120000),
-    new Event('.coal', "Coal power plant produce ", 40, 50, 120000),
-    new Event('WorldEnd', "World is END!!!! ", 98, 100, 100),
+    new Event('.wind', "Wind Turbin produce ", 1, 20, 120000),
+    new Event('.solar', "Solar panel produce ", 20, 40, 120000),
+    new Event('.coal', "Coal power plant produce ", 40, 60, 120000),
+    new Event('WorldEnd', "World is END!!!! ", 100, 101, 100),
 ];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
@@ -422,7 +422,7 @@ setInterval(function(){
 
 setInterval(function(){
     if(Date.now()>timeFinishEvent){
-        let number = randomus(1, 100, 1);
+        let number = randomus(1, 101, 1);
         for(const event of events){
             event.isOn(number);
         }
