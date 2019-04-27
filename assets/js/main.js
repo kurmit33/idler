@@ -140,27 +140,35 @@ class PowerPlant{
         return Number(product+(product*engineers*0.02)+(product*eventMulti)).toFixed(3);
     }
 
-    buildPrice(){
-        return Number((this.price+this.buildings*3)*this.multiplier);
+    buildPrice(num){
+        let tempPrice = 0;
+        for(let i=this.buildings; i<(this.buildings+num); i++){
+            tempPrice += Number((this.price+i*3)*this.multiplier);
+        }
+        return tempPrice;
     }
 
     build(m){
-        if(m>=this.buildPrice()){
-            money = Number((money - this.buildPrice()).toFixed(5));
+        if(m>=this.buildPrice(num)){
+            money = Number((money - this.buildPrice(num)).toFixed(5));
             this.buildings++;
             this.update();
         }
         else fail("You need more money!", 2000);
     }
 
-    upgradePrice(){
-        return (1+this.level)*50*this.price*this.multiplier;
+    upgradePrice(num){
+        let tempPrice = 0;
+        for(let i=this.level; i<(this.level+num); i++){
+            tempPrice += (1+i)*50*this.price*this.multiplier;
+        }
+        return tempPrice; 
     }
 
-    upgrade(m){
-        if(m>=this.upgradePrice()){
-            money = Number((money - this.upgradePrice()).toFixed(5));
-            this.level++;
+    upgrade(m, num){
+        if(m>=this.upgradePrice(num)){
+            money = Number((money - this.upgradePrice(num)).toFixed(5));
+            this.level += num;
             this.update();
         }
         else fail("You need more money!", 2000);
@@ -178,14 +186,14 @@ class PowerPlant{
 }
 
 class GreenPowerPlant extends PowerPlant{
-    build(m){
-        if(this.space() > this.buildings){
-            if(m>=this.buildPrice()){
-                money = Number((money - this.buildPrice()).toFixed(5));
-                this.buildings++;
-                if(this.buildings%25==0){
-                    greenCertification++;
+    build(m, num){
+        if(this.space() > (this.buildings+num)){
+            if(m>=this.buildPrice(num)){
+                money = Number((money - this.buildPrice(num)).toFixed(5));
+                for(let i=this.buildings; i<=(this.buildings+num); i++){
+                    if(i%25 == 0) greenCertification +=this.multiplier;
                 }
+                this.buildings += num;
                 this.update();
             }
             else fail("You need more money!", 2000);
@@ -210,20 +218,28 @@ class ConvencionalPowerPlant extends PowerPlant{
         return Number(super.production(name, multi)*100)
     }
 
-    priceGreen(){
-        return Number(this.green * (this.buildings+1));
+    priceGreen(num){
+        let tempPrice = 0;
+        for(let i=this.buildings; i<(num+this.buildings); i++){
+            tempPrice +=Number(this.green * (i+1));
+        }
+        return Number(tempPrice);
     }
 
-    upgradePriceGreen(){
-        return Number(this.green * (this.level+1));
+    upgradePriceGreen(num){
+        let tempPrice = 0;
+        for(let i=this.level; i<(num+this.level); i++){
+            tempPrice +=Number(this.green * (i+1));
+        }
+        return Number(tempPrice);
     }
     
-    build(m){
+    build(m, num){
         if(this.space() > this.buildings){
-            if((m>=this.buildPrice()) && (greenCertification>=this.priceGreen())){
-                money = Number((money - this.buildPrice()).toFixed(5));
-                greenCertification = greenCertification-this.priceGreen();
-                this.buildings++;
+            if((m>=this.buildPrice(num)) && (greenCertification>=this.priceGreen(num))){
+                money = Number((money - this.buildPrice(num)).toFixed(5));
+                greenCertification = greenCertification-this.priceGreen(num);
+                this.buildings += num;
                 this.update();
             }
             else fail("You need more money or Green Certification!", 2000);
@@ -231,11 +247,11 @@ class ConvencionalPowerPlant extends PowerPlant{
         else fail("You need more free space!", 2000);
     }
 
-    upgrade(m){
-        if((m>=this.upgradePrice()) && (greenCertification>=this.upgradePriceGreen())){
-            money = Number((money - this.upgradePrice()).toFixed(5));
-            greenCertification = greenCertification-this.upgradePriceGreen();
-            this.level++;
+    upgrade(m, num){
+        if((m>=this.upgradePrice(num)) && (greenCertification>=this.upgradePriceGreen(num))){
+            money = Number((money - this.upgradePrice(num)).toFixed(5));
+            greenCertification = greenCertification-this.upgradePriceGreen(num);
+            this.level += num;  
             this.update();
         }
         else fail("You need more money or Green Certification!", 2000);
@@ -262,7 +278,7 @@ class Event{
         }
     }
     isOn(randomNum){
-        if((randomNum>=98) && (this.name == WorldEnd)) {
+        if((randomNum>=100) && (this.name == WorldEnd)) {
             hardReset(10);
             fail(this.title, 15000);
             console.log(randomNum);
@@ -338,10 +354,10 @@ function softReset(){
 
 for(const building of buildings){
     document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
-        building.build(money);
+            building.build(money, parseInt(document.querySelector(`${building.name} .build`).value));
     });
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
-        building.upgrade(money);
+        building.upgrade(money, parseInt(document.querySelector(`${building.name} .build`).value));
     });    
 }
 
