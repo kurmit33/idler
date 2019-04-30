@@ -5,6 +5,7 @@ body{
     font-family: 'Lobster', sans-serif;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
 }
 
 .topStat{
@@ -12,6 +13,7 @@ body{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .buttons{
@@ -20,10 +22,11 @@ body{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: space-evenly;
+    justify-content: flex-start;
 }
 
 .radios{
+    margin: 5px;
     border: 2px solid #209781;
     background-color: #131936;
     padding: 3px;
@@ -67,13 +70,18 @@ body{
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 400px;
-    margin: 0px 10px;
+    width: 300px;
+    margin: 10px 20px;
+    height: 550px;
+}
+
+.cointainer{
+    margin-top: 10px;
 }
 
 .building{
-    height: 400px;
-    width: 400px;
+    height: 300px;
+    width: 300px;
     background-color: white;
     border: 3px solid black;
     border-radius: 15px;
@@ -84,12 +92,13 @@ body{
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    width: 400px;
+    width: 100%;
     margin: 0px 5px;
 }
 
 .stat .columns{
     margin: 0px;
+    height: auto;
 }
 .stat .columns .stat{
     margin-left: 10px;
@@ -97,6 +106,11 @@ body{
 #wt{
     margin: 5px;
     background-image: url("../gfx/wt.png");
+}
+
+#bioGas{
+    margin: 5px;
+    background-image: url("../gfx/bioGas.png");
 }
 
 #sl{
@@ -107,6 +121,10 @@ body{
 #coal{
     margin: 5px;
     background-image: url("../gfx/coal.png")
+}
+
+.topStat .columns{
+    height: auto;
 }
 
 .build, .upgrade, .sellElectricty, .sellgreenCer{
@@ -150,4 +168,8 @@ body{
 
 .close{
     top: -2em;
+}
+
+@mediaquery{
+
 }
