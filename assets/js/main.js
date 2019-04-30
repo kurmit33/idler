@@ -42,6 +42,24 @@ else {
     document.addEventListener(visibilityChange, changeInterval(), false);
 }
 
+function changeNumber(num, digits){
+    let si = [
+        { value: 1, symbol: "" },
+        { value: 1E3, symbol: "K" },
+        { value: 1E6, symbol: "M" },
+        { value: 1E9, symbol: "G" },
+        { value: 1E12, symbol: "T" },
+        { value: 1E15, symbol: "P" },
+        { value: 1E18, symbol: "E" }
+    ];
+
+    let rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+     let i;
+    for(i = si.length - 1; i > 0; i--){
+        if(num >si[i].value) break;
+    }
+    return (num/si[i].value).toFixed(digits).replace(rx, "$1") + ' '+si[i].symbol;
+}
 function multiSpace(num){
     let multipilerSpace = 1;
     while(num>=10){
@@ -64,8 +82,8 @@ function fail(text, timeOn){
 }
 
 function updateResources(){
-    document.querySelector(".money").innerHTML='Money: '+money;
-    document.querySelector(".electricty").innerHTML='Electricty: '+electricty;
+    document.querySelector(".money").innerHTML='Money: '+changeNumber(money, 2);
+    document.querySelector(".electricty").innerHTML='Electricty: '+changeNumber(electricty, 4);
     document.querySelector(".greenCer").innerHTML='Green certification: '+greenCertification;
     document.querySelector(".engineers").innerHTML='Engineers: '+engineers;
 }
@@ -123,12 +141,12 @@ class PowerPlant{
 
     update(){
         updateResources();
-        document.querySelector(`${this.name} .buildings`).innerHTML=this.buildings;
-        document.querySelector(`${this.name} .level`).innerHTML=this.level+1;
-        document.querySelector(`${this.name} .production`).innerHTML=this.production();
-        document.querySelector(`${this.name} .buildPrice`).innerHTML=this.buildPrice(parseInt(multiplierBuild));
-        document.querySelector(`${this.name} .upgradePrice`).innerHTML=this.upgradePrice(parseInt(multiplierBuild));
-        document.querySelector(`${this.name} .space`).innerHTML=this.space();
+        document.querySelector(`${this.name} .buildings`).innerHTML= changeNumber(this.buildings, 0);
+        document.querySelector(`${this.name} .level`).innerHTML=changeNumber(this.level+1, 0);
+        document.querySelector(`${this.name} .production`).innerHTML=changeNumber(this.production(), 0);
+        document.querySelector(`${this.name} .buildPrice`).innerHTML=changeNumber(this.buildPrice(parseInt(multiplierBuild)), 0);
+        document.querySelector(`${this.name} .upgradePrice`).innerHTML=changeNumber(this.upgradePrice(parseInt(multiplierBuild)), 0);
+        document.querySelector(`${this.name} .space`).innerHTML=changeNumber(this.space(), 0);
     }
 
     space(){
@@ -231,8 +249,8 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
     update(){
         super.update();
-        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=this.priceGreen(parseInt(multiplierBuild));
-        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=this.upgradePriceGreen(parseInt(multiplierBuild));
+        document.querySelector(`${this.name} .greenBuildPrice`).innerHTML=changeNumber(this.priceGreen(parseInt(multiplierBuild)), 0);
+        document.querySelector(`${this.name} .greenUpgradePrice`).innerHTML=changeNumber(this.upgradePriceGreen(parseInt(multiplierBuild)), 0);
     }
     build(m, num){
         if(this.space() >= (this.buildings+num)){
@@ -296,6 +314,7 @@ const buildings = [
     new GreenPowerPlant('.wind', 1),
     new GreenPowerPlant('.solar', 10),
     new ConvencionalPowerPlant('.coal', 1000),
+    new ConvencionalPowerPlant('.bioGas', 2500),
 ];
 const events = [
     new Event('.wind', "Wind Turbin produce ", 1, 20, 120000),
