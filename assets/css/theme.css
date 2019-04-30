@@ -5,6 +5,7 @@ body{
     font-family: 'Lobster', sans-serif;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
 }
 
 .topStat{
@@ -12,6 +13,7 @@ body{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    height: 100px;
 }
 
 .buttons{
@@ -67,8 +69,13 @@ body{
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    width: 400px;
-    margin: 0px 10px;
+    width: 300px;
+    margin: 10px 20px;
+    height: 550px;
+}
+
+.cointainer{
+    margin-top: 10px;
 }
 
 .building{
@@ -84,7 +91,7 @@ body{
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    width: 400px;
+    width: 100%;
     margin: 0px 5px;
 }
 
@@ -112,6 +119,10 @@ body{
 #coal{
     margin: 5px;
     background-image: url("../gfx/coal.png")
+}
+
+.topStat .columns{
+    height: 100px;
 }
 
 .build, .upgrade, .sellElectricty, .sellgreenCer{
