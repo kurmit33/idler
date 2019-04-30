@@ -72,8 +72,8 @@ body{
 }
 
 .building{
-    height: 400px;
-    width: 400px;
+    height: 300px;
+    width: 300px;
     background-color: white;
     border: 3px solid black;
     border-radius: 15px;
@@ -97,6 +97,11 @@ body{
 #wt{
     margin: 5px;
     background-image: url("../gfx/wt.png");
+}
+
+#bioGas{
+    margin: 5px;
+    background-image: url("../gfx/bioGas.png");
 }
 
 #sl{
