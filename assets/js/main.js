@@ -158,7 +158,7 @@ class PowerPlant{
         let eventMulti = 0;
         if(this.name == name) eventMulti = multi;
         let product = Number((this.buildings*(this.level)*this.multiplier)/100);
-        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*workers*0.02)).toFixed(3);
+        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*this.workers*0.02)).toFixed(3);
     }
 
     buildPrice(num){
@@ -200,7 +200,7 @@ class PowerPlant{
     updateStorage(){
         localStorage.setItem(this.name+'Level', this.level);
         localStorage.setItem(this.name+'Buildings', this.buildings);
-        localStorage.getItem(this.name+'Workers', this.workers);
+        localStorage.setItem(this.name+'Workers', this.workers);
     }
 }
 
@@ -233,20 +233,12 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
 
     priceGreen(num){
-        
-        let tempBuildGreen = 0;
-        for(let i=this.buildings; i<(this.buildings+num); i++){
-            tempBuildGreen = Number(this.green * Number(i+1))+Number(tempBuildGreen);
-        }
-        return Number(tempBuildGreen);
+        return Number(num*(this.buildings+1)*(this.multiplier/100));
     }
 
     upgradePriceGreen(num){
-        let tempPrice = 0;
-        for(let i=this.level; i<(this.level+num); i++){
-            tempPrice = Number(this.green * Number(i+1)*10)+Number(tempPrice);
-        }
-        return Number(tempPrice);
+
+        return Number(num*(this.buildings+1)*(this.multiplier/20));
     }
     update(){
         super.update();
