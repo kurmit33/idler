@@ -132,20 +132,21 @@ function sell(name){
 class PowerPlant{
     constructor(name, multiplier){
         this.buildings = 0;
-        this.level = 0;
+        this.level = 1;
         this.multiplier = multiplier;
         this.name = name;
         this.price = 5;
-        this.freeSpace = 20/multiSpace(multiplier);
+        this.freeSpace = 25;
+        this.workers = 1;
     }
 
     update(){
         updateResources();
-        document.querySelector(`${this.name} .buildings`).innerHTML= changeNumber(this.buildings, 0);
-        document.querySelector(`${this.name} .level`).innerHTML=changeNumber(this.level+1, 0);
-        document.querySelector(`${this.name} .production`).innerHTML=changeNumber(this.production(), 0);
-        document.querySelector(`${this.name} .buildPrice`).innerHTML=changeNumber(this.buildPrice(parseInt(multiplierBuild)), 0);
-        document.querySelector(`${this.name} .upgradePrice`).innerHTML=changeNumber(this.upgradePrice(parseInt(multiplierBuild)), 0);
+        document.querySelector(`${this.name} .buildings`).innerHTML= changeNumber(this.buildings, 2);
+        document.querySelector(`${this.name} .level`).innerHTML=changeNumber(this.level+1, 2);
+        document.querySelector(`${this.name} .production`).innerHTML=changeNumber(this.production(), 2);
+        document.querySelector(`${this.name} .buildPrice`).innerHTML=changeNumber(this.buildPrice(parseInt(multiplierBuild)), 4);
+        document.querySelector(`${this.name} .upgradePrice`).innerHTML=changeNumber(this.upgradePrice(parseInt(multiplierBuild)), 4);
         document.querySelector(`${this.name} .space`).innerHTML=changeNumber(this.space(), 0);
     }
 
@@ -156,16 +157,14 @@ class PowerPlant{
     production(name, multi){
         let eventMulti = 0;
         if(this.name == name) eventMulti = multi;
-        let product = Number((this.buildings*(this.level+1)*this.multiplier)/100);
-        return Number(product+(product*engineers*0.02)+(product*eventMulti)).toFixed(3);
+        let product = Number((this.buildings*(this.level)*this.multiplier)/100);
+        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*workers*0.02)).toFixed(3);
     }
 
     buildPrice(num){
-        let tempPrice = 0;
-        for(let i=this.buildings; i<(this.buildings+num); i++){
-            tempPrice = Number((this.price+i*3)*this.multiplier)+Number(tempPrice);
-        }
-        return tempPrice;
+        let lastPrice = Number((this.multiplier*(7*this.buildings+3*this.buildings*this.buildings))/2);
+        let newPrice = Number((this.multiplier*(7*(num+this.buildings)+3*(num+this.buildings)*(num+this.buildings)))/2);
+        return Number(newPrice-lastPrice);
     }
 
     build(m){
@@ -175,14 +174,12 @@ class PowerPlant{
             this.update();
         }
         else fail("You need more money!", 2000);
-    }
+    } 
 
     upgradePrice(num){
-        let tempPrice = 0;
-        for(let i=this.level; i<(this.level+num); i++){
-            tempPrice = Number((1+i)*50*this.price*this.multiplier)+Number(tempPrice);
-        }
-        return tempPrice; 
+        let lastPrice = Number(250*this.multiplier)*Number((1-Math.pow(2, this.level)*(-1)));
+        let newPrice = Number(250*this.multiplier)*Number((1-Math.pow(2, (this.level+num))*(-1)));
+        return Number(newPrice-lastPrice);
     }
 
     upgrade(m, num){
@@ -197,11 +194,13 @@ class PowerPlant{
     getStorage(){
         this.level = Number(localStorage.getItem(this.name+'Level'));
         this.buildings = Number(localStorage.getItem(this.name+'Buildings'));
+        this.workers = Number(localStorage.getItem(this.name+'Workers'))
     }
 
     updateStorage(){
         localStorage.setItem(this.name+'Level', this.level);
         localStorage.setItem(this.name+'Buildings', this.buildings);
+        localStorage.getItem(this.name+'Workers', this.workers);
     }
 }
 
@@ -213,6 +212,7 @@ class GreenPowerPlant extends PowerPlant{
                 for(let i=this.buildings; i<=(this.buildings+num); i++){
                     if(i%25 == 0) greenCertification +=this.multiplier;
                 }
+                
                 this.buildings += num;
                 this.update();
             }
@@ -233,6 +233,7 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
 
     priceGreen(num){
+        
         let tempBuildGreen = 0;
         for(let i=this.buildings; i<(this.buildings+num); i++){
             tempBuildGreen = Number(this.green * Number(i+1))+Number(tempBuildGreen);
@@ -310,6 +311,36 @@ class Event{
     }
 }
 
+class Engineer{
+    constructor(name, tittle, multipiler, from){
+        this.level = 0;
+        this.name = name;
+        this.tittle = tittle;
+        this.multipiler = multipiler;
+        this.from = from;
+        this.price = 1000;
+    }
+
+    buyPrice(){
+        return Number((this.price * this.level) + this.price);
+    }
+
+    udpate(){
+        updateResources();
+        document.querySelector(`${this.name} .upgrade`).innerHTML= "";
+        document.querySelector(`${this.name} .upgrade`).value('title', this.tittle);
+    }
+   
+    buy(engin){
+        if(engin>=this.price()){
+            engineers = Number(engineers-  this.price());
+            
+            return ".disable";
+        }
+    } 
+
+}
+
 const buildings = [
     new GreenPowerPlant('.wind', 1),
     new GreenPowerPlant('.solar', 10),
@@ -344,6 +375,7 @@ window.onload = function(){
     }
     updateResources();
     getPrice();
+    
 }
 
 function hardReset(num){
