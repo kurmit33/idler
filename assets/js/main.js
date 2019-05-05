@@ -132,7 +132,7 @@ function sell(name){
 class PowerPlant{
     constructor(name, multiplier){
         this.buildings = 0;
-        this.level = 1;
+        this.level = 0;
         this.multiplier = multiplier;
         this.name = name;
         this.price = 5;
@@ -142,6 +142,7 @@ class PowerPlant{
 
     update(){
         updateResources();
+        document.querySelector(`${this.name} .workers`).innerHTML= changeNumber(this.workers, 2);
         document.querySelector(`${this.name} .buildings`).innerHTML= changeNumber(this.buildings, 2);
         document.querySelector(`${this.name} .level`).innerHTML=changeNumber(this.level+1, 2);
         document.querySelector(`${this.name} .production`).innerHTML=changeNumber(this.production(), 2);
@@ -157,8 +158,8 @@ class PowerPlant{
     production(name, multi){
         let eventMulti = 0;
         if(this.name == name) eventMulti = multi;
-        let product = Number((this.buildings*(this.level)*this.multiplier)/100);
-        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*this.workers*0.02)).toFixed(3);
+        let product = Number((this.buildings*Number(this.level+1)*this.multiplier)/100);
+        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*this.workers*0.02)).toFixed(2);
     }
 
     buildPrice(num){
@@ -166,15 +167,6 @@ class PowerPlant{
         let newPrice = Number((this.multiplier*(7*(num+this.buildings)+3*(num+this.buildings)*(num+this.buildings)))/2);
         return Number(newPrice-lastPrice);
     }
-
-    build(m){
-        if(m>=this.buildPrice(num)){
-            money = Number((money - this.buildPrice(num)).toFixed(5));
-            this.buildings++;
-            this.update();
-        }
-        else fail("You need more money!", 2000);
-    } 
 
     upgradePrice(num){
         let lastPrice = Number(250*this.multiplier)*Number((1-Math.pow(2, this.level)*(-1)));
@@ -184,11 +176,20 @@ class PowerPlant{
 
     upgrade(m, num){
         if(m>=this.upgradePrice(num)){
+            if(this.buildings === this.space()){
             money = Number((money - this.upgradePrice(num)).toFixed(5));
             this.level += num;
             this.update();
+            }
+            else fail("You need more buildings!", 2000);
         }
         else fail("You need more money!", 2000);
+    }
+    hire(eng, num){
+        if(num<=eng){
+            this.workers += num;
+            engineers -= num;
+        }
     }
 
     getStorage(){
@@ -209,10 +210,7 @@ class GreenPowerPlant extends PowerPlant{
         if(this.space() >= (this.buildings+num)){
             if(m>=this.buildPrice(num)){
                 money = Number((money - this.buildPrice(num)).toFixed(5));
-                for(let i=this.buildings; i<=(this.buildings+num); i++){
-                    if(i%25 == 0) greenCertification +=this.multiplier;
-                }
-                
+                greenCertification += num;
                 this.buildings += num;
                 this.update();
             }
@@ -260,10 +258,13 @@ class ConvencionalPowerPlant extends PowerPlant{
 
     upgrade(m, num){
         if((m>=this.upgradePrice(num)) && (greenCertification>=this.upgradePriceGreen(num))){
-            money = Number((money - this.upgradePrice(num)).toFixed(5));
-            greenCertification = greenCertification-this.upgradePriceGreen(num);
-            this.level += num;  
-            this.update();
+            if(this.buildings === this.space()){
+                money = Number((money - this.upgradePrice(num)).toFixed(5));
+                greenCertification = greenCertification-this.upgradePriceGreen(num);
+                this.level += num;  
+                this.update();
+            }
+            else fail("You need more buildings!", 2000);
         }
         else fail("You need more money or Green Certification!", 2000);
     }
@@ -414,6 +415,9 @@ for(const building of buildings){
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
         building.upgrade(money, parseInt(multiplierBuild));
     });    
+    document.querySelector(`${building.name} .hire`).addEventListener('click', function(){ 
+        building.hire(engineers, parseInt(multiplierBuild));
+    }); 
 }
 for(const radio of document.querySelectorAll('.radios')){
         radio.addEventListener('click', function(){
@@ -468,6 +472,7 @@ setInterval(function(){
         let number = randomus(1, 101, 1);
         for(const event of events){
             event.isOn(number);
+            console.log("tak");
         }
     }
 }, 300000);
