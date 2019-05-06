@@ -60,14 +60,6 @@ function changeNumber(num, digits){
     }
     return (num/si[i].value).toFixed(digits).replace(rx, "$1") + ' '+si[i].symbol;
 }
-function multiSpace(num){
-    let multipilerSpace = 1;
-    while(num>=10){
-        multipilerSpace++;
-        num = (num/10).toFixed();
-    }
-    return multipilerSpace;
-}
 
 function fail(text, timeOn){
     let alert = document.querySelector("#alert");
@@ -132,16 +124,17 @@ function sell(name){
 class PowerPlant{
     constructor(name, multiplier){
         this.buildings = 0;
-        this.level = 1;
+        this.level = 0;
         this.multiplier = multiplier;
         this.name = name;
         this.price = 5;
-        this.freeSpace = 25;
-        this.workers = 1;
+        this.freeSpace = 2000;
+        this.workers = 0;
     }
 
     update(){
         updateResources();
+        document.querySelector(`${this.name} .workers`).innerHTML= changeNumber(this.workers, 2);
         document.querySelector(`${this.name} .buildings`).innerHTML= changeNumber(this.buildings, 2);
         document.querySelector(`${this.name} .level`).innerHTML=changeNumber(this.level+1, 2);
         document.querySelector(`${this.name} .production`).innerHTML=changeNumber(this.production(), 2);
@@ -157,8 +150,8 @@ class PowerPlant{
     production(name, multi){
         let eventMulti = 0;
         if(this.name == name) eventMulti = multi;
-        let product = Number((this.buildings*(this.level)*this.multiplier)/100);
-        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*workers*0.02)).toFixed(3);
+        let product = Number((this.buildings*Number(this.level+1)*this.multiplier)/100);
+        return Number(product+(product*engineers*0.002)+(product*eventMulti)+(product*this.workers*0.02)).toFixed(2);
     }
 
     buildPrice(num){
@@ -166,15 +159,6 @@ class PowerPlant{
         let newPrice = Number((this.multiplier*(7*(num+this.buildings)+3*(num+this.buildings)*(num+this.buildings)))/2);
         return Number(newPrice-lastPrice);
     }
-
-    build(m){
-        if(m>=this.buildPrice(num)){
-            money = Number((money - this.buildPrice(num)).toFixed(5));
-            this.buildings++;
-            this.update();
-        }
-        else fail("You need more money!", 2000);
-    } 
 
     upgradePrice(num){
         let lastPrice = Number(250*this.multiplier)*Number((1-Math.pow(2, this.level)*(-1)));
@@ -184,11 +168,20 @@ class PowerPlant{
 
     upgrade(m, num){
         if(m>=this.upgradePrice(num)){
+            if(this.buildings >= (this.space()/80)){
             money = Number((money - this.upgradePrice(num)).toFixed(5));
             this.level += num;
             this.update();
+            }
+            else fail("You need more buildings!", 2000);
         }
         else fail("You need more money!", 2000);
+    }
+    hire(eng, num){
+        if(num<=eng){
+            this.workers += num;
+            engineers -= num;
+        }
     }
 
     getStorage(){
@@ -200,7 +193,7 @@ class PowerPlant{
     updateStorage(){
         localStorage.setItem(this.name+'Level', this.level);
         localStorage.setItem(this.name+'Buildings', this.buildings);
-        localStorage.getItem(this.name+'Workers', this.workers);
+        localStorage.setItem(this.name+'Workers', this.workers);
     }
 }
 
@@ -209,10 +202,7 @@ class GreenPowerPlant extends PowerPlant{
         if(this.space() >= (this.buildings+num)){
             if(m>=this.buildPrice(num)){
                 money = Number((money - this.buildPrice(num)).toFixed(5));
-                for(let i=this.buildings; i<=(this.buildings+num); i++){
-                    if(i%25 == 0) greenCertification +=this.multiplier;
-                }
-                
+                greenCertification += num;
                 this.buildings += num;
                 this.update();
             }
@@ -233,20 +223,12 @@ class ConvencionalPowerPlant extends PowerPlant{
     }
 
     priceGreen(num){
-        
-        let tempBuildGreen = 0;
-        for(let i=this.buildings; i<(this.buildings+num); i++){
-            tempBuildGreen = Number(this.green * Number(i+1))+Number(tempBuildGreen);
-        }
-        return Number(tempBuildGreen);
+        return Number(num*(this.buildings+1)*(this.multiplier/100));
     }
 
     upgradePriceGreen(num){
-        let tempPrice = 0;
-        for(let i=this.level; i<(this.level+num); i++){
-            tempPrice = Number(this.green * Number(i+1)*10)+Number(tempPrice);
-        }
-        return Number(tempPrice);
+
+        return Number(num*(this.buildings+1)*(this.multiplier/20));
     }
     update(){
         super.update();
@@ -268,10 +250,13 @@ class ConvencionalPowerPlant extends PowerPlant{
 
     upgrade(m, num){
         if((m>=this.upgradePrice(num)) && (greenCertification>=this.upgradePriceGreen(num))){
-            money = Number((money - this.upgradePrice(num)).toFixed(5));
-            greenCertification = greenCertification-this.upgradePriceGreen(num);
-            this.level += num;  
-            this.update();
+            if(this.buildings >= (this.space()/80)){
+                money = Number((money - this.upgradePrice(num)).toFixed(5));
+                greenCertification = greenCertification-this.upgradePriceGreen(num);
+                this.level += num;  
+                this.update();
+            }
+            else fail("You need more buildings!", 2000);
         }
         else fail("You need more money or Green Certification!", 2000);
     }
@@ -298,7 +283,7 @@ class Event{
     }
     isOn(randomNum){
         if((randomNum>=100) && (this.name == 'WorldEnd')) {
-            hardReset(10);
+            hardReset(true);
             fail(this.title, 15000);
         }
         if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
@@ -344,14 +329,20 @@ class Engineer{
 const buildings = [
     new GreenPowerPlant('.wind', 1),
     new GreenPowerPlant('.solar', 10),
+    new GreenPowerPlant('.water', 10000),
+    new GreenPowerPlant('.geo', 50000),
+    new GreenPowerPlant('.wave', 500),
     new ConvencionalPowerPlant('.coal', 1000),
-    new ConvencionalPowerPlant('.bioGas', 2500),
+    new ConvencionalPowerPlant('.bioGas', 5000),
+    new ConvencionalPowerPlant('.gas', 15000),
+    new ConvencionalPowerPlant('.nuclear', 500000),
+    new ConvencionalPowerPlant('.fusion', 1000000),
 ];
 const events = [
     new Event('.wind', "Wind Turbin produce ", 1, 20, 120000),
     new Event('.solar', "Solar panel produce ", 20, 40, 120000),
     new Event('.coal', "Coal power plant produce ", 40, 60, 120000),
-    new Event('WorldEnd', "World is END!!!! ", 100, 101, 100),
+    new Event('WorldEnd', "World is END!", 100, 101, 100),
 ];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
@@ -378,17 +369,28 @@ window.onload = function(){
     
 }
 
-function hardReset(num){
+function hardReset(a){
     localStorage.clear();
+    if(a === true){
+        let tempBuildings = 0;
+        let tempEnginiers = 0;
+        for(const building of buildings){
+            tempBuildings += Number(building.buildings);
+        }
+        tempEnginiers = Number(Math.floor(tempBuildings/2000));
+        engineers += tempEnginiers;
+    }
     money = 5;
     electricty = 0;
     greenCertification = 0;
     for(const building of buildings){
         building.level = 0;
         building.buildings = 0;
+        building.workers = 0;
         building.update();
+        building.updateStorage();
     }
-    engineers = Number(num)+Number(engineers);
+    setResources();
 }
 
 function check(num){
@@ -405,16 +407,6 @@ function check(num){
     lastMultiplierBuild = multiplierBuild;
 }
 
-function softReset(){
-    let tempBuildings = 0;
-    let tempEnginiers = 0;
-    for(const building of buildings){
-        tempBuildings += Number(building.buildings);
-    }
-    tempEnginiers = Number(Math.floor(tempBuildings/2000));
-    hardReset(tempEnginiers);
-}
-
 for(const building of buildings){
     document.querySelector(`${building.name} .build`).addEventListener('click', function(){ 
             building.build(money, parseInt(multiplierBuild));
@@ -422,6 +414,9 @@ for(const building of buildings){
     document.querySelector(`${building.name} .upgrade`).addEventListener('click', function(){ 
         building.upgrade(money, parseInt(multiplierBuild));
     });    
+    document.querySelector(`${building.name} .hire`).addEventListener('click', function(){ 
+        building.hire(engineers, parseInt(multiplierBuild));
+    }); 
 }
 for(const radio of document.querySelectorAll('.radios')){
         radio.addEventListener('click', function(){
@@ -430,10 +425,10 @@ for(const radio of document.querySelectorAll('.radios')){
     });
 }
 document.querySelector('.hardReset').addEventListener('click', function(){
-    hardReset(0);
+    hardReset(false);
 });
 document.querySelector('.softReset').addEventListener('click', function(){
-    softReset();
+    hardReset(true);
 });
 document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
@@ -476,6 +471,7 @@ setInterval(function(){
         let number = randomus(1, 101, 1);
         for(const event of events){
             event.isOn(number);
+            console.log("tak");
         }
     }
-}, 300000);
+}, 30000);

@@ -103,12 +103,13 @@ body{
 .stat .columns .stat{
     margin-left: 10px;
 }
+
 #wt{
     margin: 5px;
     background-image: url("../gfx/wt.png");
 }
 
-#bioGas{
+#bg{
     margin: 5px;
     background-image: url("../gfx/bioGas.png");
 }
@@ -118,16 +119,43 @@ body{
     background-image: url("../gfx/foto.png")
 }
 
-#coal{
+#wl{
+    margin: 5px;
+    background-image: url("../gfx/water.png")
+}
+
+#wv{
+    margin: 5px;
+    background-image: url("../gfx/wave.png");
+}
+
+#gt{
+    margin: 5px;
+    background-image: url("../gfx/geo.png")
+}
+#nc{
+    margin: 5px;
+    background-image: url("../gfx/nuclera.png")
+}
+#gs{
+    margin: 5px;
+    background-image: url("../gfx/gas.png")
+}
+
+#cl{
     margin: 5px;
     background-image: url("../gfx/coal.png")
+}
+#fs{
+    margin: 5px;
+    background-image: url("../gfx/fusion.png")
 }
 
 .topStat .columns{
     height: auto;
 }
 
-.build, .upgrade, .sellElectricty, .sellgreenCer{
+.build, .upgrade, .sellElectricty, .sellgreenCer, .hire{
     width: auto;
     margin: 5px;
     text-align: center;
@@ -138,13 +166,18 @@ body{
     outline: none;
 }
 
-.build:hover, .upgrade:hover, .sellElectricty:hover, .sellgreenCer:hover{
+.build:hover, .upgrade:hover, .sellElectricty:hover, .sellgreenCer:hover, .hire:hover{
     border: 2px solid #131936;
     background-color: #209781;
     color: #131936;
 }
 .sellElectricty, .sellgreenCer{
     width: 100px;
+}
+
+.reset{
+    margin: 10px;
+    
 }
 
 #alert{
