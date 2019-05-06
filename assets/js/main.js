@@ -60,14 +60,6 @@ function changeNumber(num, digits){
     }
     return (num/si[i].value).toFixed(digits).replace(rx, "$1") + ' '+si[i].symbol;
 }
-function multiSpace(num){
-    let multipilerSpace = 1;
-    while(num>=10){
-        multipilerSpace++;
-        num = (num/10).toFixed();
-    }
-    return multipilerSpace;
-}
 
 function fail(text, timeOn){
     let alert = document.querySelector("#alert");
@@ -136,8 +128,8 @@ class PowerPlant{
         this.multiplier = multiplier;
         this.name = name;
         this.price = 5;
-        this.freeSpace = 25;
-        this.workers = 1;
+        this.freeSpace = 2000;
+        this.workers = 0;
     }
 
     update(){
@@ -176,7 +168,7 @@ class PowerPlant{
 
     upgrade(m, num){
         if(m>=this.upgradePrice(num)){
-            if(this.buildings === this.space()){
+            if(this.buildings >= (this.space()/80)){
             money = Number((money - this.upgradePrice(num)).toFixed(5));
             this.level += num;
             this.update();
@@ -258,7 +250,7 @@ class ConvencionalPowerPlant extends PowerPlant{
 
     upgrade(m, num){
         if((m>=this.upgradePrice(num)) && (greenCertification>=this.upgradePriceGreen(num))){
-            if(this.buildings === this.space()){
+            if(this.buildings >= (this.space()/80)){
                 money = Number((money - this.upgradePrice(num)).toFixed(5));
                 greenCertification = greenCertification-this.upgradePriceGreen(num);
                 this.level += num;  
@@ -291,7 +283,7 @@ class Event{
     }
     isOn(randomNum){
         if((randomNum>=100) && (this.name == 'WorldEnd')) {
-            hardReset(10);
+            hardReset(true);
             fail(this.title, 15000);
         }
         if((randomNum >= this.chanceMin) && (randomNum<this.chanceMax)){
@@ -337,14 +329,20 @@ class Engineer{
 const buildings = [
     new GreenPowerPlant('.wind', 1),
     new GreenPowerPlant('.solar', 10),
+    new GreenPowerPlant('.water', 10000),
+    new GreenPowerPlant('.geo', 50000),
+    new GreenPowerPlant('.wave', 500),
     new ConvencionalPowerPlant('.coal', 1000),
-    new ConvencionalPowerPlant('.bioGas', 2500),
+    new ConvencionalPowerPlant('.bioGas', 5000),
+    new ConvencionalPowerPlant('.gas', 15000),
+    new ConvencionalPowerPlant('.nuclear', 500000),
+    new ConvencionalPowerPlant('.fusion', 1000000),
 ];
 const events = [
     new Event('.wind', "Wind Turbin produce ", 1, 20, 120000),
     new Event('.solar', "Solar panel produce ", 20, 40, 120000),
     new Event('.coal', "Coal power plant produce ", 40, 60, 120000),
-    new Event('WorldEnd', "World is END!!!! ", 100, 101, 100),
+    new Event('WorldEnd', "World is END!", 100, 101, 100),
 ];
 function offlineProduction(){
     let timeDiff = Number((Date.now() - localStorage.getItem('lastTime'))/100);
@@ -371,17 +369,28 @@ window.onload = function(){
     
 }
 
-function hardReset(num){
+function hardReset(a){
     localStorage.clear();
+    if(a === true){
+        let tempBuildings = 0;
+        let tempEnginiers = 0;
+        for(const building of buildings){
+            tempBuildings += Number(building.buildings);
+        }
+        tempEnginiers = Number(Math.floor(tempBuildings/2000));
+        engineers += tempEnginiers;
+    }
     money = 5;
     electricty = 0;
     greenCertification = 0;
     for(const building of buildings){
         building.level = 0;
         building.buildings = 0;
+        building.workers = 0;
         building.update();
+        building.updateStorage();
     }
-    engineers = Number(num)+Number(engineers);
+    setResources();
 }
 
 function check(num){
@@ -396,16 +405,6 @@ function check(num){
         }
     }
     lastMultiplierBuild = multiplierBuild;
-}
-
-function softReset(){
-    let tempBuildings = 0;
-    let tempEnginiers = 0;
-    for(const building of buildings){
-        tempBuildings += Number(building.buildings);
-    }
-    tempEnginiers = Number(Math.floor(tempBuildings/2000));
-    hardReset(tempEnginiers);
 }
 
 for(const building of buildings){
@@ -426,10 +425,10 @@ for(const radio of document.querySelectorAll('.radios')){
     });
 }
 document.querySelector('.hardReset').addEventListener('click', function(){
-    hardReset(0);
+    hardReset(false);
 });
 document.querySelector('.softReset').addEventListener('click', function(){
-    softReset();
+    hardReset(true);
 });
 document.querySelector('.sellElectricty').addEventListener('click', function(){
     sell('electricty');
@@ -475,4 +474,4 @@ setInterval(function(){
             console.log("tak");
         }
     }
-}, 300000);
+}, 30000);
